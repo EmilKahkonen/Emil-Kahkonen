@@ -59,10 +59,12 @@ h1 {
   line-height: 1.7;
 }
 
+/* Project cover grid */
+
 #projects {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 55px 25px;
+  gap: 40px 25px;
 }
 
 .project {
@@ -71,7 +73,7 @@ h1 {
 }
 
 .cover {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   background: #eee;
   display: flex;
   justify-content: center;
@@ -98,7 +100,11 @@ h1 {
   margin: 0;
 }
 
-#galleryView { display: none; }
+/* Project gallery */
+
+#galleryView {
+  display: none;
+}
 
 .back {
   background: none;
@@ -109,11 +115,15 @@ h1 {
   margin-bottom: 40px;
 }
 
-#galleryTitle { margin-bottom: 40px; }
+#galleryTitle {
+  margin-bottom: 40px;
+}
+
+/* Square thumbnails, four per row on wide screens */
 
 #slides {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 25px 15px;
 }
 
@@ -122,11 +132,23 @@ h1 {
   min-width: 0;
 }
 
-.slide canvas {
-  display: block;
+.slide-preview {
+  aspect-ratio: 1 / 1;
   width: 100%;
-  height: auto;
   background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.slide-preview canvas {
+  display: block;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
 }
 
 .slide p {
@@ -142,6 +164,8 @@ footer {
   color: #777;
 }
 
+/* Full-screen PDF viewer */
+
 #viewer {
   display: none;
   position: fixed;
@@ -153,7 +177,9 @@ footer {
   justify-content: center;
 }
 
-#viewer.open { display: flex; }
+#viewer.open {
+  display: flex;
+}
 
 #largeSlide {
   max-width: 88vw;
@@ -174,7 +200,8 @@ footer {
   font-size: 13px;
 }
 
-.viewerTop button, .arrow {
+.viewerTop button,
+.arrow {
   color: white;
   background: transparent;
   border: 0;
@@ -199,13 +226,34 @@ footer {
   color: #ccc;
 }
 
+/* Responsive layout */
+
+@media (min-width: 651px) and (max-width: 1000px) {
+  #slides {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 650px) {
   header { padding: 23px 5%; }
   header span { display: none; }
   main { padding-top: 45px; }
-  #projects { grid-template-columns: 1fr; gap: 35px; }
-  #slides { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 10px; }
-  #largeSlide { max-width: 100vw; max-height: 75vh; }
+
+  #projects {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  #slides {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 10px;
+  }
+
+  #largeSlide {
+    max-width: 100vw;
+    max-height: 75vh;
+  }
+
   .arrow { font-size: 22px; }
 }
 </style>
@@ -238,11 +286,13 @@ footer {
 
 <footer>© 2026 Emil Kähkönen</footer>
 
-<div id="viewer" role="dialog" aria-modal="true" aria-label="Slide viewer">
+<div id="viewer" role="dialog" aria-modal="true"
+     aria-label="Slide viewer">
   <div class="viewerTop">
     <span id="viewerTitle"></span>
     <button id="closeButton" aria-label="Close">✕</button>
   </div>
+
   <button class="arrow" id="prev" aria-label="Previous slide">←</button>
   <canvas id="largeSlide"></canvas>
   <button class="arrow" id="next" aria-label="Next slide">→</button>
@@ -250,6 +300,7 @@ footer {
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
@@ -361,7 +412,8 @@ async function openProject(index) {
 
   document.getElementById("homeView").style.display = "none";
   document.getElementById("galleryView").style.display = "block";
-  document.getElementById("galleryTitle").textContent = projects[index].title;
+  document.getElementById("galleryTitle").textContent =
+    projects[index].title;
   document.getElementById("galleryDescription").textContent =
     projects[index].description;
 
@@ -375,16 +427,28 @@ async function openProject(index) {
     for (let n = 1; n <= pdf.numPages; n++) {
       const card = document.createElement("div");
       card.className = "slide";
-      card.innerHTML = `<canvas></canvas><p>PAGE ${String(n).padStart(2, "0")}</p>`;
+
+      card.innerHTML = `
+        <div class="slide-preview">
+          <canvas></canvas>
+        </div>
+        <p>PAGE ${String(n).padStart(2, "0")}</p>
+      `;
 
       card.addEventListener("click", () => showSlide(n));
       slides.appendChild(card);
 
-      renderPage(pdf, n, card.querySelector("canvas"), 650, 850)
-        .catch(console.error);
+      renderPage(
+        pdf,
+        n,
+        card.querySelector("canvas"),
+        650,
+        650
+      ).catch(console.error);
     }
   } catch (error) {
-    slides.textContent = "Could not load this PDF. Check the filename.";
+    slides.textContent =
+      "Could not load this PDF. Check the filename.";
     console.error(error);
   }
 
@@ -418,6 +482,7 @@ async function showSlide(pageNumber) {
 
 async function changeSlide(direction) {
   if (currentProject === null) return;
+
   const pdf = await loadPDF(projects[currentProject]);
   const nextPage = currentPage + direction;
 
@@ -455,6 +520,7 @@ document.getElementById("viewer").addEventListener("click", (event) => {
 
 document.addEventListener("keydown", (event) => {
   if (!document.getElementById("viewer").classList.contains("open")) return;
+
   if (event.key === "ArrowRight") changeSlide(1);
   if (event.key === "ArrowLeft") changeSlide(-1);
   if (event.key === "Escape") closeViewer();
@@ -462,7 +528,9 @@ document.addEventListener("keydown", (event) => {
 
 document.getElementById("viewer").addEventListener("wheel", (event) => {
   if (!document.getElementById("viewer").classList.contains("open")) return;
+
   event.preventDefault();
+
   if (Math.abs(event.deltaY) > 20) {
     changeSlide(event.deltaY > 0 ? 1 : -1);
   }
