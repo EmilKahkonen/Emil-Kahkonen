@@ -7,7 +7,9 @@
 <title>Emil Kähkönen — Portfolio</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
@@ -59,7 +61,7 @@ h1 {
   line-height: 1.7;
 }
 
-/* Project cover grid */
+/* PROJECT COVER GRID */
 
 #projects {
   display: grid;
@@ -75,9 +77,6 @@ h1 {
 .cover {
   aspect-ratio: 1 / 1;
   background: #eee;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   overflow: hidden;
 }
 
@@ -86,6 +85,11 @@ h1 {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: opacity .2s ease;
+}
+
+.project:hover .cover img {
+  opacity: .85;
 }
 
 .project h2 {
@@ -100,7 +104,7 @@ h1 {
   margin: 0;
 }
 
-/* Project gallery */
+/* PROJECT GALLERY */
 
 #galleryView {
   display: none;
@@ -116,10 +120,10 @@ h1 {
 }
 
 #galleryTitle {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
-/* Square thumbnails, four per row on wide screens */
+/* SQUARE JPG THUMBNAILS */
 
 #slides {
   display: grid;
@@ -142,12 +146,10 @@ h1 {
   overflow: hidden;
 }
 
-.slide-preview canvas {
+.slide-preview img {
   display: block;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  width: auto !important;
-  height: auto !important;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -157,6 +159,8 @@ h1 {
   margin-top: 10px;
 }
 
+/* FOOTER */
+
 footer {
   padding: 30px 5%;
   border-top: 1px solid #ddd;
@@ -164,7 +168,7 @@ footer {
   color: #777;
 }
 
-/* Full-screen PDF viewer */
+/* LARGE IMAGE VIEWER */
 
 #viewer {
   display: none;
@@ -182,8 +186,9 @@ footer {
 }
 
 #largeSlide {
-  max-width: 88vw;
-  max-height: 84vh;
+  display: block;
+  max-width: 84vw;
+  max-height: 82vh;
   width: auto;
   height: auto;
   object-fit: contain;
@@ -216,8 +221,13 @@ footer {
   transform: translateY(-50%);
 }
 
-#prev { left: 12px; }
-#next { right: 12px; }
+#prev {
+  left: 12px;
+}
+
+#next {
+  right: 12px;
+}
 
 #counter {
   position: absolute;
@@ -226,7 +236,7 @@ footer {
   color: #ccc;
 }
 
-/* Responsive layout */
+/* RESPONSIVE LAYOUT */
 
 @media (min-width: 651px) and (max-width: 1000px) {
   #slides {
@@ -235,9 +245,17 @@ footer {
 }
 
 @media (max-width: 650px) {
-  header { padding: 23px 5%; }
-  header span { display: none; }
-  main { padding-top: 45px; }
+  header {
+    padding: 23px 5%;
+  }
+
+  header span {
+    display: none;
+  }
+
+  main {
+    padding-top: 45px;
+  }
 
   #projects {
     grid-template-columns: 1fr;
@@ -254,7 +272,9 @@ footer {
     max-height: 75vh;
   }
 
-  .arrow { font-size: 22px; }
+  .arrow {
+    font-size: 22px;
+  }
 }
 </style>
 </head>
@@ -267,127 +287,171 @@ footer {
 </header>
 
 <main>
+
+  <!-- FRONT PAGE -->
+
   <section id="homeView">
     <h1>Selected work.</h1>
+
     <p class="intro">
       A selection of my projects.<br>
       Explore each project below.
     </p>
+
     <div id="projects"></div>
   </section>
 
+  <!-- PROJECT GALLERY -->
+
   <section id="galleryView">
     <button class="back" id="backButton">← All projects</button>
+
     <h1 id="galleryTitle"></h1>
+
     <p class="intro" id="galleryDescription"></p>
+
     <div id="slides"></div>
   </section>
+
 </main>
 
 <footer>© 2026 Emil Kähkönen</footer>
 
+<!-- FULL-SCREEN IMAGE VIEWER -->
+
 <div id="viewer" role="dialog" aria-modal="true"
-     aria-label="Slide viewer">
+     aria-label="Image viewer">
+
   <div class="viewerTop">
     <span id="viewerTitle"></span>
     <button id="closeButton" aria-label="Close">✕</button>
   </div>
 
-  <button class="arrow" id="prev" aria-label="Previous slide">←</button>
-  <canvas id="largeSlide"></canvas>
-  <button class="arrow" id="next" aria-label="Next slide">→</button>
+  <button class="arrow" id="prev" aria-label="Previous page">←</button>
+
+  <img id="largeSlide" src="" alt="Project page">
+
+  <button class="arrow" id="next" aria-label="Next page">→</button>
+
   <div id="counter"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-/* PROJECTS */
+/*
+==================================================
+PROJECT SETTINGS
+==================================================
+
+Project pages are JPG images in the "pages" folder.
+
+Example:
+pages/01 - Chapel_1.jpg
+pages/01 - Chapel_2.jpg
+pages/01 - Chapel_3.jpg
+
+The code automatically looks for numbered pages
+and stops when the next JPG file is not found.
+*/
 
 const projects = [
   {
     title: "01 - Chapel",
     category: "EPFL · 2025",
     description: "Bio-Sourced Self-Bearing Watertight Building Envelopes, St. Loup Chapel.",
-    file: "01 - Chapel.pdf",
+    prefix: "01 - Chapel",
     cover: "covers/01 - Chapel.jpg"
   },
   {
     title: "02 - Map",
     category: "EPFL · 2025",
     description: "The development of Zürich.",
-    file: "02 - Map.pdf",
+    prefix: "02 - Map",
     cover: "covers/02 - Map.jpg"
   },
   {
     title: "03 - Lapinlahti",
     category: "Aalto · 2026",
     description: "A Reuse Plan for Lapinlahti Hospital.",
-    file: "03 - Lapinlahti.pdf",
+    prefix: "03 - Lapinlahti",
     cover: "covers/03 - Lapinlahti.jpg"
   },
   {
     title: "04 - Cultural Centre",
     category: "Aalto · 2025",
     description: "A Solid Brick Structure for Culture in Taka-Töölö.",
-    file: "04 - Cultural Centre.pdf",
+    prefix: "04 - Cultural Centre",
     cover: "covers/04 - Cultural Centre.jpg"
   },
   {
     title: "05 - Apartment Building",
     category: "Aalto · 2025",
     description: "A Residential Building Shaped by a Rhythm of Columns in Myllypuro.",
-    file: "05 - Apartment Building.pdf",
+    prefix: "05 - Apartment Building",
     cover: "covers/05 - Apartment Building.jpg"
   }
 ];
 
-const cache = new Map();
+/* STATE */
+
 let currentProject = null;
 let currentPage = 1;
-let renderToken = 0;
+let projectPages = {};
+let viewerToken = 0;
 
-async function loadPDF(project) {
-  if (!cache.has(project.file)) {
-    const promise = pdfjsLib.getDocument(project.file).promise;
-    cache.set(project.file, promise);
+/* IMAGE PATH */
+
+function pagePath(project, pageNumber) {
+  return "pages/" + project.prefix + "_" + pageNumber + ".jpg";
+}
+
+/* CHECK WHETHER AN IMAGE EXISTS */
+
+function imageExists(src) {
+  return new Promise((resolve) => {
+    const image = new Image();
+
+    image.onload = () => resolve(true);
+    image.onerror = () => resolve(false);
+
+    image.src = src;
+  });
+}
+
+/* FIND ALL NUMBERED PAGES FOR A PROJECT */
+
+async function findProjectPages(project) {
+  if (projectPages[project.prefix]) {
+    return projectPages[project.prefix];
   }
-  return cache.get(project.file);
+
+  const pages = [];
+  let pageNumber = 1;
+  const maxPages = 500;
+
+  while (pageNumber <= maxPages) {
+    const src = pagePath(project, pageNumber);
+    const exists = await imageExists(src);
+
+    if (!exists) {
+      break;
+    }
+
+    pages.push(src);
+    pageNumber++;
+  }
+
+  projectPages[project.prefix] = pages;
+
+  return pages;
 }
 
-async function renderPage(pdf, pageNumber, canvas, maxWidth, maxHeight) {
-  const page = await pdf.getPage(pageNumber);
-  const original = page.getViewport({ scale: 1 });
+/* CREATE FRONT-PAGE PROJECT CARDS */
 
-  const scale = Math.min(
-    maxWidth / original.width,
-    maxHeight / original.height
-  );
-
-  const viewport = page.getViewport({ scale });
-  const ratio = window.devicePixelRatio || 1;
-  const context = canvas.getContext("2d");
-
-  canvas.width = Math.floor(viewport.width * ratio);
-  canvas.height = Math.floor(viewport.height * ratio);
-  canvas.style.width = viewport.width + "px";
-  canvas.style.height = viewport.height + "px";
-
-  await page.render({
-    canvasContext: context,
-    viewport: viewport,
-    transform: ratio !== 1 ? [ratio, 0, 0, ratio, 0, 0] : null
-  }).promise;
-}
-
-async function init() {
+function init() {
   const container = document.getElementById("projects");
 
-  for (let i = 0; i < projects.length; i++) {
-    const project = projects[i];
+  projects.forEach((project, index) => {
     const card = document.createElement("article");
     card.className = "project";
 
@@ -396,113 +460,148 @@ async function init() {
         <img
           src="${project.cover}"
           alt="${project.title} cover"
+          loading="lazy"
         >
       </div>
+
       <h2>${project.title}</h2>
       <p>${project.category}</p>
     `;
 
-    card.addEventListener("click", () => openProject(i));
+    card.addEventListener("click", () => openProject(index));
+
     container.appendChild(card);
-  }
+  });
 }
+
+/* OPEN A PROJECT */
 
 async function openProject(index) {
   currentProject = index;
 
   document.getElementById("homeView").style.display = "none";
   document.getElementById("galleryView").style.display = "block";
+
   document.getElementById("galleryTitle").textContent =
     projects[index].title;
+
   document.getElementById("galleryDescription").textContent =
     projects[index].description;
 
   const slides = document.getElementById("slides");
   slides.innerHTML = "<p>Loading project pages…</p>";
 
-  try {
-    const pdf = await loadPDF(projects[index]);
-    slides.innerHTML = "";
+  window.scrollTo(0, 0);
 
-    for (let n = 1; n <= pdf.numPages; n++) {
-      const card = document.createElement("div");
-      card.className = "slide";
+  const pages = await findProjectPages(projects[index]);
 
-      card.innerHTML = `
-        <div class="slide-preview">
-          <canvas></canvas>
-        </div>
-        <p>PAGE ${String(n).padStart(2, "0")}</p>
-      `;
+  /* Ignore the result if another project was opened meanwhile. */
+  if (currentProject !== index) return;
 
-      card.addEventListener("click", () => showSlide(n));
-      slides.appendChild(card);
+  slides.innerHTML = "";
 
-      renderPage(
-        pdf,
-        n,
-        card.querySelector("canvas"),
-        650,
-        650
-      ).catch(console.error);
-    }
-  } catch (error) {
-    slides.textContent =
-      "Could not load this PDF. Check the filename.";
-    console.error(error);
+  if (pages.length === 0) {
+    slides.innerHTML = `
+      <p>
+        No JPG pages found. Check the folder and filenames.
+      </p>
+    `;
+    return;
   }
 
-  window.scrollTo(0, 0);
+  pages.forEach((src, pageIndex) => {
+    const pageNumber = pageIndex + 1;
+    const card = document.createElement("div");
+
+    card.className = "slide";
+
+    card.innerHTML = `
+      <div class="slide-preview">
+        <img
+          src="${src}"
+          alt="${projects[index].title}, page ${pageNumber}"
+          loading="lazy"
+        >
+      </div>
+
+      <p>PAGE ${String(pageNumber).padStart(2, "0")}</p>
+    `;
+
+    card.addEventListener("click", () => showSlide(pageNumber));
+
+    slides.appendChild(card);
+  });
 }
 
+/* SHOW A LARGE PAGE */
+
 async function showSlide(pageNumber) {
+  if (currentProject === null) return;
+
+  const pages = await findProjectPages(projects[currentProject]);
+
+  if (pageNumber < 1 || pageNumber > pages.length) return;
+
   currentPage = pageNumber;
-  const token = ++renderToken;
+  const token = ++viewerToken;
+
   const project = projects[currentProject];
-  const pdf = await loadPDF(project);
+  const image = document.getElementById("largeSlide");
 
   document.getElementById("viewer").classList.add("open");
   document.getElementById("viewerTitle").textContent = project.title;
-  document.getElementById("counter").textContent =
-    `${currentPage} / ${pdf.numPages}`;
-
-  await renderPage(
-    pdf,
-    currentPage,
-    document.getElementById("largeSlide"),
-    window.innerWidth * 0.85,
-    window.innerHeight * 0.78
-  );
-
-  if (token !== renderToken) return;
 
   document.getElementById("counter").textContent =
-    `${currentPage} / ${pdf.numPages}`;
+    `${currentPage} / ${pages.length}`;
+
+  image.style.visibility = "hidden";
+  image.src = pages[pageNumber - 1];
+
+  image.onload = () => {
+    if (token !== viewerToken) return;
+    image.style.visibility = "visible";
+  };
+
+  image.onerror = () => {
+    if (token !== viewerToken) return;
+    image.style.visibility = "visible";
+  };
 }
+
+/* NEXT OR PREVIOUS PAGE */
 
 async function changeSlide(direction) {
   if (currentProject === null) return;
 
-  const pdf = await loadPDF(projects[currentProject]);
+  const pages = await findProjectPages(projects[currentProject]);
   const nextPage = currentPage + direction;
 
-  if (nextPage >= 1 && nextPage <= pdf.numPages) {
-    await showSlide(nextPage);
+  if (nextPage >= 1 && nextPage <= pages.length) {
+    showSlide(nextPage);
   }
 }
 
+/* CLOSE VIEWER */
+
 function closeViewer() {
   document.getElementById("viewer").classList.remove("open");
-  renderToken++;
+  viewerToken++;
 }
+
+/* RETURN TO FRONT PAGE */
 
 function goHome() {
   closeViewer();
+
   document.getElementById("galleryView").style.display = "none";
   document.getElementById("homeView").style.display = "block";
+
   currentProject = null;
+
   window.scrollTo(0, 0);
 }
+
+/* BUTTONS */
 
 document.getElementById("prev").onclick = () => changeSlide(-1);
 document.getElementById("next").onclick = () => changeSlide(1);
@@ -514,29 +613,53 @@ document.getElementById("homeLink").onclick = (event) => {
   goHome();
 };
 
+/* CLICK OUTSIDE IMAGE TO CLOSE */
+
 document.getElementById("viewer").addEventListener("click", (event) => {
-  if (event.target.id === "viewer") closeViewer();
+  if (event.target.id === "viewer") {
+    closeViewer();
+  }
 });
 
+/* KEYBOARD CONTROLS */
+
 document.addEventListener("keydown", (event) => {
-  if (!document.getElementById("viewer").classList.contains("open")) return;
+  if (!document.getElementById("viewer").classList.contains("open")) {
+    return;
+  }
 
   if (event.key === "ArrowRight") changeSlide(1);
   if (event.key === "ArrowLeft") changeSlide(-1);
   if (event.key === "Escape") closeViewer();
 });
 
+/* MOUSE WHEEL CONTROLS */
+
+let wheelLocked = false;
+
 document.getElementById("viewer").addEventListener("wheel", (event) => {
-  if (!document.getElementById("viewer").classList.contains("open")) return;
+  if (!document.getElementById("viewer").classList.contains("open")) {
+    return;
+  }
 
   event.preventDefault();
 
-  if (Math.abs(event.deltaY) > 20) {
-    changeSlide(event.deltaY > 0 ? 1 : -1);
-  }
+  if (wheelLocked || Math.abs(event.deltaY) < 20) return;
+
+  wheelLocked = true;
+
+  changeSlide(event.deltaY > 0 ? 1 : -1);
+
+  setTimeout(() => {
+    wheelLocked = false;
+  }, 250);
+
 }, { passive: false });
 
+/* START */
+
 init();
+
 </script>
 
 </body>
