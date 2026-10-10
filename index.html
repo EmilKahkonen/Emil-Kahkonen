@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emil Kähkönen — Portfolio</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #f8f8f6;
+  color: #171717;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+  padding: 35px 5%;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.name {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+
+header span {
+  color: #777;
+  font-size: 13px;
+}
+
+main {
+  max-width: 1500px;
+  padding: 70px 5%;
+  margin: auto;
+}
+
+h1 {
+  font-size: clamp(42px, 7vw, 90px);
+  letter-spacing: -.06em;
+  font-weight: 500;
+  margin: 0 0 15px;
+}
+
+.intro {
+  color: #666;
+  margin-bottom: 65px;
+  line-height: 1.7;
+}
+
+#projects {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 55px 25px;
+}
+
+.project {
+  cursor: pointer;
+  min-width: 0;
+}
+
+.cover {
+  aspect-ratio: 4 / 3;
+  background: #eee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project h2 {
+  font-size: 19px;
+  font-weight: 500;
+  margin: 17px 0 5px;
+}
+
+.project p {
+  color: #777;
+  font-size: 13px;
+  margin: 0;
+}
+
+#galleryView { display: none; }
+
+.back {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 14px;
+  cursor: pointer;
+  margin-bottom: 40px;
+}
+
+#galleryTitle { margin-bottom: 40px; }
+
+#slides {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 25px 15px;
+}
+
+.slide {
+  cursor: pointer;
+  min-width: 0;
+}
+
+.slide canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #eee;
+}
+
+.slide p {
+  font-size: 12px;
+  color: #777;
+  margin-top: 10px;
+}
+
+footer {
+  padding: 30px 5%;
+  border-top: 1px solid #ddd;
+  font-size: 12px;
+  color: #777;
+}
+
+#viewer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(15, 15, 15, .97);
+  color: white;
+  align-items: center;
+  justify-content: center;
+}
+
+#viewer.open { display: flex; }
+
+#largeSlide {
+  max-width: 88vw;
+  max-height: 84vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.viewerTop {
+  position: absolute;
+  top: 20px;
+  left: 25px;
+  right: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.viewerTop button, .arrow {
+  color: white;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 28px;
+  padding: 10px;
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#prev { left: 12px; }
+#next { right: 12px; }
+
+#counter {
+  position: absolute;
+  bottom: 18px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+@media (max-width: 650px) {
+  header { padding: 23px 5%; }
+  header span { display: none; }
+  main { padding-top: 45px; }
+  #projects { grid-template-columns: 1fr; gap: 35px; }
+  #slides { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 10px; }
+  #largeSlide { max-width: 100vw; max-height: 75vh; }
+  .arrow { font-size: 22px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a class="name" href="#" id="homeLink">Emil Kähkönen</a>
+  <span>SELECTED WORK · PORTFOLIO</span>
+</header>
+
+<main>
+  <section id="homeView">
+    <h1>Selected work.</h1>
+    <p class="intro">
+      A selection of my projects.<br>
+      Explore each project below.
+    </p>
+    <div id="projects"></div>
+  </section>
+
+  <section id="galleryView">
+    <button class="back" id="backButton">← All projects</button>
+    <h1 id="galleryTitle"></h1>
+    <p class="intro" id="galleryDescription"></p>
+    <div id="slides"></div>
+  </section>
+</main>
+
+<footer>© 2026 Emil Kähkönen</footer>
+
+<div id="viewer" role="dialog" aria-modal="true" aria-label="Slide viewer">
+  <div class="viewerTop">
+    <span id="viewerTitle"></span>
+    <button id="closeButton" aria-label="Close">✕</button>
+  </div>
+  <button class="arrow" id="prev" aria-label="Previous slide">←</button>
+  <canvas id="largeSlide"></canvas>
+  <button class="arrow" id="next" aria-label="Next slide">→</button>
+  <div id="counter"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+/* PROJECTS */
+
+const projects = [
+  {
+    title: "01 - Chapel",
+    category: "EPFL · 2025",
+    description: "Bio-Sourced Self-Bearing Watertight Building Envelopes, St. Loup Chapel.",
+    file: "01 - Chapel.pdf",
+    cover: "covers/01 - Chapel.jpg"
+  },
+  {
+    title: "02 - Map",
+    category: "EPFL · 2025",
+    description: "The development of Zürich.",
+    file: "02 - Map.pdf",
+    cover: "covers/02 - Map.jpg"
+  },
+  {
+    title: "03 - Lapinlahti",
+    category: "Aalto · 2026",
+    description: "A Reuse Plan for Lapinlahti Hospital.",
+    file: "03 - Lapinlahti.pdf",
+    cover: "covers/03 - Lapinlahti.jpg"
+  },
+  {
+    title: "04 - Cultural Centre",
+    category: "Aalto · 2025",
+    description: "A Solid Brick Structure for Culture in Taka-Töölö.",
+    file: "04 - Cultural Centre.pdf",
+    cover: "covers/04 - Cultural Centre.jpg"
+  },
+  {
+    title: "05 - Apartment Building",
+    category: "Aalto · 2025",
+    description: "A Residential Building Shaped by a Rhythm of Columns in Myllypuro.",
+    file: "05 - Apartment Building.pdf",
+    cover: "covers/05 - Apartment Building.jpg"
+  }
+];
+
+const cache = new Map();
+let currentProject = null;
+let currentPage = 1;
+let renderToken = 0;
+
+async function loadPDF(project) {
+  if (!cache.has(project.file)) {
+    const promise = pdfjsLib.getDocument(project.file).promise;
+    cache.set(project.file, promise);
+  }
+  return cache.get(project.file);
+}
+
+async function renderPage(pdf, pageNumber, canvas, maxWidth, maxHeight) {
+  const page = await pdf.getPage(pageNumber);
+  const original = page.getViewport({ scale: 1 });
+
+  const scale = Math.min(
+    maxWidth / original.width,
+    maxHeight / original.height
+  );
+
+  const viewport = page.getViewport({ scale });
+  const ratio = window.devicePixelRatio || 1;
+  const context = canvas.getContext("2d");
+
+  canvas.width = Math.floor(viewport.width * ratio);
+  canvas.height = Math.floor(viewport.height * ratio);
+  canvas.style.width = viewport.width + "px";
+  canvas.style.height = viewport.height + "px";
+
+  await page.render({
+    canvasContext: context,
+    viewport: viewport,
+    transform: ratio !== 1 ? [ratio, 0, 0, ratio, 0, 0] : null
+  }).promise;
+}
+
+async function init() {
+  const container = document.getElementById("projects");
+
+  for (let i = 0; i < projects.length; i++) {
+    const project = projects[i];
+    const card = document.createElement("article");
+    card.className = "project";
+
+    card.innerHTML = `
+      <div class="cover">
+        <img
+          src="${project.cover}"
+          alt="${project.title} cover"
+        >
+      </div>
+      <h2>${project.title}</h2>
+      <p>${project.category}</p>
+    `;
+
+    card.addEventListener("click", () => openProject(i));
+    container.appendChild(card);
+  }
+}
+
+async function openProject(index) {
+  currentProject = index;
+
+  document.getElementById("homeView").style.display = "none";
+  document.getElementById("galleryView").style.display = "block";
+  document.getElementById("galleryTitle").textContent = projects[index].title;
+  document.getElementById("galleryDescription").textContent =
+    projects[index].description;
+
+  const slides = document.getElementById("slides");
+  slides.innerHTML = "<p>Loading project pages…</p>";
+
+  try {
+    const pdf = await loadPDF(projects[index]);
+    slides.innerHTML = "";
+
+    for (let n = 1; n <= pdf.numPages; n++) {
+      const card = document.createElement("div");
+      card.className = "slide";
+      card.innerHTML = `<canvas></canvas><p>PAGE ${String(n).padStart(2, "0")}</p>`;
+
+      card.addEventListener("click", () => showSlide(n));
+      slides.appendChild(card);
+
+      renderPage(pdf, n, card.querySelector("canvas"), 650, 850)
+        .catch(console.error);
+    }
+  } catch (error) {
+    slides.textContent = "Could not load this PDF. Check the filename.";
+    console.error(error);
+  }
+
+  window.scrollTo(0, 0);
+}
+
+async function showSlide(pageNumber) {
+  currentPage = pageNumber;
+  const token = ++renderToken;
+  const project = projects[currentProject];
+  const pdf = await loadPDF(project);
+
+  document.getElementById("viewer").classList.add("open");
+  document.getElementById("viewerTitle").textContent = project.title;
+  document.getElementById("counter").textContent =
+    `${currentPage} / ${pdf.numPages}`;
+
+  await renderPage(
+    pdf,
+    currentPage,
+    document.getElementById("largeSlide"),
+    window.innerWidth * 0.85,
+    window.innerHeight * 0.78
+  );
+
+  if (token !== renderToken) return;
+
+  document.getElementById("counter").textContent =
+    `${currentPage} / ${pdf.numPages}`;
+}
+
+async function changeSlide(direction) {
+  if (currentProject === null) return;
+  const pdf = await loadPDF(projects[currentProject]);
+  const nextPage = currentPage + direction;
+
+  if (nextPage >= 1 && nextPage <= pdf.numPages) {
+    await showSlide(nextPage);
+  }
+}
+
+function closeViewer() {
+  document.getElementById("viewer").classList.remove("open");
+  renderToken++;
+}
+
+function goHome() {
+  closeViewer();
+  document.getElementById("galleryView").style.display = "none";
+  document.getElementById("homeView").style.display = "block";
+  currentProject = null;
+  window.scrollTo(0, 0);
+}
+
+document.getElementById("prev").onclick = () => changeSlide(-1);
+document.getElementById("next").onclick = () => changeSlide(1);
+document.getElementById("closeButton").onclick = closeViewer;
+document.getElementById("backButton").onclick = goHome;
+
+document.getElementById("homeLink").onclick = (event) => {
+  event.preventDefault();
+  goHome();
+};
+
+document.getElementById("viewer").addEventListener("click", (event) => {
+  if (event.target.id === "viewer") closeViewer();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (!document.getElementById("viewer").classList.contains("open")) return;
+  if (event.key === "ArrowRight") changeSlide(1);
+  if (event.key === "ArrowLeft") changeSlide(-1);
+  if (event.key === "Escape") closeViewer();
+});
+
+document.getElementById("viewer").addEventListener("wheel", (event) => {
+  if (!document.getElementById("viewer").classList.contains("open")) return;
+  event.preventDefault();
+  if (Math.abs(event.deltaY) > 20) {
+    changeSlide(event.deltaY > 0 ? 1 : -1);
+  }
+}, { passive: false });
+
+init();
+</script>
+
+</body>
+</html>
