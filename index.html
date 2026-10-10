@@ -2,665 +2,878 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Emil Kähkönen — Portfolio</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
 
-<style>
-* {
-  box-sizing: border-box;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-  margin: 0;
-  background: #f8f8f6;
-  color: #171717;
-  font-family: Arial, Helvetica, sans-serif;
-}
+    :root {
+      --background: #f8f8f6;
+      --text: #171717;
+      --muted: #777;
+      --line: #deded9;
+    }
 
-header {
-  padding: 35px 5%;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-header a {
-  color: inherit;
-  text-decoration: none;
-}
+    button {
+      font: inherit;
+    }
 
-.name {
-  font-size: 19px;
-  font-weight: 600;
-  letter-spacing: .04em;
-}
+    header {
+      padding: 28px 5vw 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
 
-header span {
-  color: #777;
-  font-size: 13px;
-}
+    .site-name {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
 
-main {
-  max-width: 1500px;
-  padding: 70px 5%;
-  margin: auto;
-}
+    header a {
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+    }
 
-h1 {
-  font-size: clamp(42px, 7vw, 90px);
-  letter-spacing: -.06em;
-  font-weight: 500;
-  margin: 0 0 15px;
-}
+    .intro {
+      padding: 7vw 5vw 5vw;
+      max-width: 1000px;
+    }
 
-.intro {
-  color: #666;
-  margin-bottom: 65px;
-  line-height: 1.7;
-}
+    .intro h1 {
+      margin: 0 0 20px;
+      font-size: clamp(42px, 8vw, 100px);
+      line-height: 0.95;
+      font-weight: 400;
+      letter-spacing: -0.06em;
+    }
 
-/* PROJECT COVER GRID */
+    .intro p {
+      max-width: 540px;
+      font-size: 16px;
+      line-height: 1.65;
+      color: #555;
+    }
 
-#projects {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 40px 25px;
-}
+    .project-grid {
+      padding: 0 5vw 8vw;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 48px 22px;
+    }
 
-.project {
-  cursor: pointer;
-  min-width: 0;
-}
+    .project-card {
+      cursor: pointer;
+      min-width: 0;
+    }
 
-.cover {
-  aspect-ratio: 1 / 1;
-  background: #eee;
-  overflow: hidden;
-}
+    .cover-wrap {
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: #e9e9e5;
+      position: relative;
+    }
 
-.cover img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity .2s ease;
-}
+    .cover-wrap img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
 
-.project:hover .cover img {
-  opacity: .85;
-}
+    .project-card:hover .cover-wrap > img {
+      transform: scale(1.025);
+    }
 
-.project h2 {
-  font-size: 19px;
-  font-weight: 500;
-  margin: 17px 0 5px;
-}
+    .project-meta {
+      padding-top: 13px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+    }
 
-.project p {
-  color: #777;
-  font-size: 13px;
-  margin: 0;
-}
+    .project-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 500;
+    }
 
-/* PROJECT GALLERY */
+    .project-category {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+    }
 
-#galleryView {
-  display: none;
-}
+    .project-page {
+      display: none;
+      padding: 28px 5vw 8vw;
+    }
 
-.back {
-  background: none;
-  border: 0;
-  padding: 0;
-  font-size: 14px;
-  cursor: pointer;
-  margin-bottom: 40px;
-}
+    .back-button {
+      border: 0;
+      padding: 0;
+      margin: 0 0 35px;
+      background: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+    }
 
-#galleryTitle {
-  margin-bottom: 20px;
-}
+    .project-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
 
-/* SQUARE JPG THUMBNAILS */
+    .project-heading h1 {
+      font-size: clamp(34px, 6vw, 72px);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      font-weight: 400;
+      margin: 0;
+    }
 
-#slides {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 25px 15px;
-}
+    .project-heading p {
+      max-width: 360px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #555;
+      margin: 0;
+    }
 
-.slide {
-  cursor: pointer;
-  min-width: 0;
-}
+    .page-count {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 15px;
+    }
 
-.slide-preview {
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  background: #eee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
+    .pages-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
 
-.slide-preview img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+    .page-thumb {
+      aspect-ratio: 1 / 1;
+      position: relative;
+      overflow: hidden;
+      background: #e9e9e5;
+      cursor: pointer;
+    }
 
-.slide p {
-  font-size: 12px;
-  color: #777;
-  margin-top: 10px;
-}
+    .page-thumb > img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
 
-/* FOOTER */
+    /* Jaettavan sivun neljänneksien esikatselu */
 
-footer {
-  padding: 30px 5%;
-  border-top: 1px solid #ddd;
-  font-size: 12px;
-  color: #777;
-}
+    .quadrant-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
 
-/* LARGE IMAGE VIEWER */
+    .quadrant {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      transition: background 0.2s ease;
+    }
 
-#viewer {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  background: rgba(15, 15, 15, .97);
-  color: white;
-  align-items: center;
-  justify-content: center;
-}
+    .quadrant::after {
+      content: "+";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 28px;
+      font-weight: 300;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
 
-#viewer.open {
-  display: flex;
-}
+    .quadrant-grid:hover .quadrant:not(:hover) {
+      background: rgba(90, 90, 90, 0.48);
+    }
 
-#largeSlide {
-  display: block;
-  max-width: 84vw;
-  max-height: 82vh;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-}
+    .quadrant-grid:hover .quadrant:not(:hover)::after {
+      opacity: 0;
+    }
 
-.viewerTop {
-  position: absolute;
-  top: 20px;
-  left: 25px;
-  right: 25px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-}
+    .quadrant:hover::after {
+      opacity: 1;
+    }
 
-.viewerTop button,
-.arrow {
-  color: white;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-  font-size: 28px;
-  padding: 10px;
-}
+    .quadrant:hover {
+      background: transparent;
+    }
 
-.arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-}
+    .page-label {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 5px 8px;
+      font-size: 11px;
+      pointer-events: none;
+    }
 
-#prev {
-  left: 12px;
-}
+    /* Suurennettu katselu */
 
-#next {
-  right: 12px;
-}
+    .viewer {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(248, 248, 246, 0.97);
+      padding: 22px;
+      align-items: center;
+      justify-content: center;
+    }
 
-#counter {
-  position: absolute;
-  bottom: 18px;
-  font-size: 13px;
-  color: #ccc;
-}
+    .viewer.open {
+      display: flex;
+    }
 
-/* RESPONSIVE LAYOUT */
+    .viewer-inner {
+      width: min(100%, 1100px);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
 
-@media (min-width: 651px) and (max-width: 1000px) {
-  #slides {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
+    .viewer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 15px;
+    }
 
-@media (max-width: 650px) {
-  header {
-    padding: 23px 5%;
-  }
+    .viewer-title {
+      font-size: 13px;
+      color: #555;
+    }
 
-  header span {
-    display: none;
-  }
+    .viewer-close {
+      border: 1px solid var(--line);
+      background: transparent;
+      padding: 9px 13px;
+      cursor: pointer;
+    }
 
-  main {
-    padding-top: 45px;
-  }
+    .viewer-content {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
 
-  #projects {
-    grid-template-columns: 1fr;
-    gap: 35px;
-  }
+    .large-slide-frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
 
-  #slides {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px 10px;
-  }
+    .large-slide-frame img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
 
-  #largeSlide {
-    max-width: 100vw;
-    max-height: 75vh;
-  }
+    .large-slide-frame.zoomed {
+      width: min(100%, calc(100vh - 130px));
+      height: min(100%, calc(100vh - 130px));
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+    }
 
-  .arrow {
-    font-size: 22px;
-  }
-}
-</style>
+    .large-slide-frame.zoomed img {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      max-width: none;
+      max-height: none;
+      object-fit: fill;
+    }
+
+    .large-slide-frame.q-tl img {
+      left: 0;
+      top: 0;
+    }
+
+    .large-slide-frame.q-tr img {
+      left: -100%;
+      top: 0;
+    }
+
+    .large-slide-frame.q-bl img {
+      left: 0;
+      top: -100%;
+    }
+
+    .large-slide-frame.q-br img {
+      left: -100%;
+      top: -100%;
+    }
+
+    .viewer-bottom {
+      padding-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      font-size: 12px;
+      color: #555;
+    }
+
+    .viewer-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .viewer-controls button {
+      border: 1px solid var(--line);
+      background: transparent;
+      padding: 9px 13px;
+      cursor: pointer;
+    }
+
+    .viewer-controls button:hover,
+    .viewer-close:hover {
+      background: #e9e9e5;
+    }
+
+    .empty-message {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 30px 0;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 25px 5vw;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 650px) {
+      header {
+        padding: 22px 5vw;
+      }
+
+      .intro {
+        padding-top: 60px;
+      }
+
+      .project-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .pages-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .project-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .viewer {
+        padding: 12px;
+      }
+
+      .viewer-controls button {
+        padding: 8px 10px;
+      }
+
+      footer {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <header>
+    <div class="site-name">PORTFOLIO</div>
+    <a href="mailto:your.email@example.com">CONTACT</a>
+  </header>
 
-<header>
-  <a class="name" href="#" id="homeLink">Emil Kähkönen</a>
-  <span>SELECTED WORK · PORTFOLIO</span>
-</header>
+  <main>
+    <section class="intro" id="homeIntro">
+      <h1>Selected<br>Works</h1>
+      <p>
+        A selection of architectural projects, explorations and visual studies.
+      </p>
+    </section>
 
-<main>
+    <section class="project-grid" id="projectGrid"></section>
 
-  <!-- FRONT PAGE -->
+    <section class="project-page" id="projectPage">
+      <button class="back-button" id="backButton">← All projects</button>
 
-  <section id="homeView">
-    <h1>Selected work.</h1>
+      <div class="project-heading">
+        <h1 id="projectTitle"></h1>
+        <p id="projectDescription"></p>
+      </div>
 
-    <p class="intro">
-      A selection of my projects.<br>
-      Explore each project below.
-    </p>
+      <div class="page-count" id="pageCount"></div>
+      <div class="pages-grid" id="pagesGrid"></div>
+    </section>
+  </main>
 
-    <div id="projects"></div>
-  </section>
+  <footer>
+    <span>Selected Works</span>
+    <span>Architecture · Design · Visual Research</span>
+  </footer>
 
-  <!-- PROJECT GALLERY -->
+  <div class="viewer" id="viewer" aria-hidden="true">
+    <div class="viewer-inner">
+      <div class="viewer-top">
+        <div class="viewer-title" id="viewerTitle"></div>
+        <button class="viewer-close" id="closeViewer">Close ✕</button>
+      </div>
 
-  <section id="galleryView">
-    <button class="back" id="backButton">← All projects</button>
+      <div class="viewer-content" id="viewerContent">
+        <div class="large-slide-frame" id="largeSlideFrame">
+          <img id="largeSlide" alt="">
+        </div>
+      </div>
 
-    <h1 id="galleryTitle"></h1>
-
-    <p class="intro" id="galleryDescription"></p>
-
-    <div id="slides"></div>
-  </section>
-
-</main>
-
-<footer>© 2026 Emil Kähkönen</footer>
-
-<!-- FULL-SCREEN IMAGE VIEWER -->
-
-<div id="viewer" role="dialog" aria-modal="true"
-     aria-label="Image viewer">
-
-  <div class="viewerTop">
-    <span id="viewerTitle"></span>
-    <button id="closeButton" aria-label="Close">✕</button>
+      <div class="viewer-bottom">
+        <span id="viewerCounter"></span>
+        <div class="viewer-controls">
+          <button id="previousSlide" aria-label="Previous slide">←</button>
+          <button id="nextSlide" aria-label="Next slide">→</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <button class="arrow" id="prev" aria-label="Previous page">←</button>
+  <script>
+    const projects = [
+      {
+        title: "01 - Chapel",
+        category: "Architecture",
+        description: "A chapel project exploring space, light and materiality.",
+        prefix: "01 - Chapel",
+        cover: "covers/01 - Chapel.jpg",
+        splitPages: [2, 3, 4, 5]
+      },
+      {
+        title: "02 - Map",
+        category: "Mapping",
+        description: "A mapping project and spatial investigation.",
+        prefix: "02 - Map",
+        cover: "covers/02 - Map.jpg",
+        splitPages: []
+      },
+      {
+        title: "03 - Lapinlahti",
+        category: "Architecture",
+        description: "A project exploring place, history and reuse.",
+        prefix: "03 - Lapinlahti",
+        cover: "covers/03 - Lapinlahti.jpg",
+        splitPages: []
+      },
+      {
+        title: "04 - Cultural Centre",
+        category: "Architecture",
+        description: "A cultural centre project.",
+        prefix: "04 - Cultural Centre",
+        cover: "covers/04 - Cultural Centre.jpg",
+        splitPages: []
+      },
+      {
+        title: "05 - Apartment Building",
+        category: "Housing",
+        description: "An apartment building project.",
+        prefix: "05 - Apartment Building",
+        cover: "covers/05 - Apartment Building.jpg",
+        splitPages: []
+      }
+    ];
 
-  <img id="largeSlide" src="" alt="Project page">
+    const projectGrid = document.getElementById("projectGrid");
+    const homeIntro = document.getElementById("homeIntro");
+    const projectPage = document.getElementById("projectPage");
+    const projectTitle = document.getElementById("projectTitle");
+    const projectDescription = document.getElementById("projectDescription");
+    const pageCount = document.getElementById("pageCount");
+    const pagesGrid = document.getElementById("pagesGrid");
 
-  <button class="arrow" id="next" aria-label="Next page">→</button>
+    const viewer = document.getElementById("viewer");
+    const viewerTitle = document.getElementById("viewerTitle");
+    const viewerCounter = document.getElementById("viewerCounter");
+    const largeSlideFrame = document.getElementById("largeSlideFrame");
+    const largeSlide = document.getElementById("largeSlide");
 
-  <div id="counter"></div>
-</div>
+    let activeProject = null;
+    let activePages = [];
+    let activeSequence = [];
+    let activeIndex = 0;
 
-<script>
+    const quadrantNames = ["q-tl", "q-tr", "q-bl", "q-br"];
+    const quadrantLabels = [
+      "Top left",
+      "Top right",
+      "Bottom left",
+      "Bottom right"
+    ];
 
-/*
-==================================================
-PROJECT SETTINGS
-==================================================
+    function renderProjects() {
+      projectGrid.innerHTML = "";
 
-Project pages are JPG images in the "pages" folder.
+      projects.forEach((project) => {
+        const card = document.createElement("article");
+        card.className = "project-card";
 
-Example:
-pages/01 - Chapel_1.jpg
-pages/01 - Chapel_2.jpg
-pages/01 - Chapel_3.jpg
+        const coverWrap = document.createElement("div");
+        coverWrap.className = "cover-wrap";
 
-The code automatically looks for numbered pages
-and stops when the next JPG file is not found.
-*/
+        const image = document.createElement("img");
+        image.src = project.cover;
+        image.alt = project.title;
+        image.loading = "lazy";
 
-const projects = [
-  {
-    title: "01 - Chapel",
-    category: "EPFL · 2025",
-    description: "Bio-Sourced Self-Bearing Watertight Building Envelopes, St. Loup Chapel.",
-    prefix: "01 - Chapel",
-    cover: "covers/01 - Chapel.jpg"
-  },
-  {
-    title: "02 - Map",
-    category: "EPFL · 2025",
-    description: "The development of Zürich.",
-    prefix: "02 - Map",
-    cover: "covers/02 - Map.jpg"
-  },
-  {
-    title: "03 - Lapinlahti",
-    category: "Aalto · 2026",
-    description: "A Reuse Plan for Lapinlahti Hospital.",
-    prefix: "03 - Lapinlahti",
-    cover: "covers/03 - Lapinlahti.jpg"
-  },
-  {
-    title: "04 - Cultural Centre",
-    category: "Aalto · 2025",
-    description: "A Solid Brick Structure for Culture in Taka-Töölö.",
-    prefix: "04 - Cultural Centre",
-    cover: "covers/04 - Cultural Centre.jpg"
-  },
-  {
-    title: "05 - Apartment Building",
-    category: "Aalto · 2025",
-    description: "A Residential Building Shaped by a Rhythm of Columns in Myllypuro.",
-    prefix: "05 - Apartment Building",
-    cover: "covers/05 - Apartment Building.jpg"
-  }
-];
+        image.onerror = () => {
+          image.style.display = "none";
+          coverWrap.style.background = "#e9e9e5";
+        };
 
-/* STATE */
+        coverWrap.appendChild(image);
 
-let currentProject = null;
-let currentPage = 1;
-let projectPages = {};
-let viewerToken = 0;
+        const meta = document.createElement("div");
+        meta.className = "project-meta";
 
-/* IMAGE PATH */
+        const title = document.createElement("h2");
+        title.className = "project-title";
+        title.textContent = project.title;
 
-function pagePath(project, pageNumber) {
-  return "pages/" + project.prefix + "_" + pageNumber + ".jpg";
-}
+        const category = document.createElement("span");
+        category.className = "project-category";
+        category.textContent = project.category;
 
-/* CHECK WHETHER AN IMAGE EXISTS */
+        meta.append(title, category);
+        card.append(coverWrap, meta);
 
-function imageExists(src) {
-  return new Promise((resolve) => {
-    const image = new Image();
+        card.addEventListener("click", () => openProject(project));
 
-    image.onload = () => resolve(true);
-    image.onerror = () => resolve(false);
-
-    image.src = src;
-  });
-}
-
-/* FIND ALL NUMBERED PAGES FOR A PROJECT */
-
-async function findProjectPages(project) {
-  if (projectPages[project.prefix]) {
-    return projectPages[project.prefix];
-  }
-
-  const pages = [];
-  let pageNumber = 1;
-  const maxPages = 500;
-
-  while (pageNumber <= maxPages) {
-    const src = pagePath(project, pageNumber);
-    const exists = await imageExists(src);
-
-    if (!exists) {
-      break;
+        projectGrid.appendChild(card);
+      });
     }
 
-    pages.push(src);
-    pageNumber++;
-  }
-
-  projectPages[project.prefix] = pages;
-
-  return pages;
-}
-
-/* CREATE FRONT-PAGE PROJECT CARDS */
-
-function init() {
-  const container = document.getElementById("projects");
-
-  projects.forEach((project, index) => {
-    const card = document.createElement("article");
-    card.className = "project";
-
-    card.innerHTML = `
-      <div class="cover">
-        <img
-          src="${project.cover}"
-          alt="${project.title} cover"
-          loading="lazy"
-        >
-      </div>
-
-      <h2>${project.title}</h2>
-      <p>${project.category}</p>
-    `;
-
-    card.addEventListener("click", () => openProject(index));
-
-    container.appendChild(card);
-  });
-}
-
-/* OPEN A PROJECT */
-
-async function openProject(index) {
-  currentProject = index;
-
-  document.getElementById("homeView").style.display = "none";
-  document.getElementById("galleryView").style.display = "block";
-
-  document.getElementById("galleryTitle").textContent =
-    projects[index].title;
-
-  document.getElementById("galleryDescription").textContent =
-    projects[index].description;
-
-  const slides = document.getElementById("slides");
-  slides.innerHTML = "<p>Loading project pages…</p>";
-
-  window.scrollTo(0, 0);
-
-  const pages = await findProjectPages(projects[index]);
-
-  /* Ignore the result if another project was opened meanwhile. */
-  if (currentProject !== index) return;
-
-  slides.innerHTML = "";
-
-  if (pages.length === 0) {
-    slides.innerHTML = `
-      <p>
-        No JPG pages found. Check the folder and filenames.
-      </p>
-    `;
-    return;
-  }
-
-  pages.forEach((src, pageIndex) => {
-    const pageNumber = pageIndex + 1;
-    const card = document.createElement("div");
-
-    card.className = "slide";
-
-    card.innerHTML = `
-      <div class="slide-preview">
-        <img
-          src="${src}"
-          alt="${projects[index].title}, page ${pageNumber}"
-          loading="lazy"
-        >
-      </div>
-
-      <p>PAGE ${String(pageNumber).padStart(2, "0")}</p>
-    `;
-
-    card.addEventListener("click", () => showSlide(pageNumber));
-
-    slides.appendChild(card);
-  });
-}
-
-/* SHOW A LARGE PAGE */
-
-async function showSlide(pageNumber) {
-  if (currentProject === null) return;
-
-  const pages = await findProjectPages(projects[currentProject]);
-
-  if (pageNumber < 1 || pageNumber > pages.length) return;
-
-  currentPage = pageNumber;
-  const token = ++viewerToken;
-
-  const project = projects[currentProject];
-  const image = document.getElementById("largeSlide");
-
-  document.getElementById("viewer").classList.add("open");
-  document.getElementById("viewerTitle").textContent = project.title;
-
-  document.getElementById("counter").textContent =
-    `${currentPage} / ${pages.length}`;
-
-  image.style.visibility = "hidden";
-  image.src = pages[pageNumber - 1];
-
-  image.onload = () => {
-    if (token !== viewerToken) return;
-    image.style.visibility = "visible";
-  };
-
-  image.onerror = () => {
-    if (token !== viewerToken) return;
-    image.style.visibility = "visible";
-  };
-}
-
-/* NEXT OR PREVIOUS PAGE */
-
-async function changeSlide(direction) {
-  if (currentProject === null) return;
-
-  const pages = await findProjectPages(projects[currentProject]);
-  const nextPage = currentPage + direction;
-
-  if (nextPage >= 1 && nextPage <= pages.length) {
-    showSlide(nextPage);
-  }
-}
-
-/* CLOSE VIEWER */
-
-function closeViewer() {
-  document.getElementById("viewer").classList.remove("open");
-  viewerToken++;
-}
-
-/* RETURN TO FRONT PAGE */
-
-function goHome() {
-  closeViewer();
-
-  document.getElementById("galleryView").style.display = "none";
-  document.getElementById("homeView").style.display = "block";
-
-  currentProject = null;
-
-  window.scrollTo(0, 0);
-}
-
-/* BUTTONS */
-
-document.getElementById("prev").onclick = () => changeSlide(-1);
-document.getElementById("next").onclick = () => changeSlide(1);
-document.getElementById("closeButton").onclick = closeViewer;
-document.getElementById("backButton").onclick = goHome;
-
-document.getElementById("homeLink").onclick = (event) => {
-  event.preventDefault();
-  goHome();
-};
-
-/* CLICK OUTSIDE IMAGE TO CLOSE */
-
-document.getElementById("viewer").addEventListener("click", (event) => {
-  if (event.target.id === "viewer") {
-    closeViewer();
-  }
-});
-
-/* KEYBOARD CONTROLS */
-
-document.addEventListener("keydown", (event) => {
-  if (!document.getElementById("viewer").classList.contains("open")) {
-    return;
-  }
-
-  if (event.key === "ArrowRight") changeSlide(1);
-  if (event.key === "ArrowLeft") changeSlide(-1);
-  if (event.key === "Escape") closeViewer();
-});
-
-/* MOUSE WHEEL CONTROLS */
-
-let wheelLocked = false;
-
-document.getElementById("viewer").addEventListener("wheel", (event) => {
-  if (!document.getElementById("viewer").classList.contains("open")) {
-    return;
-  }
-
-  event.preventDefault();
-
-  if (wheelLocked || Math.abs(event.deltaY) < 20) return;
-
-  wheelLocked = true;
-
-  changeSlide(event.deltaY > 0 ? 1 : -1);
-
-  setTimeout(() => {
-    wheelLocked = false;
-  }, 250);
-
-}, { passive: false });
-
-/* START */
-
-init();
-
-</script>
-
+    async function discoverPages(project) {
+      const pages = [];
+      let number = 1;
+
+      while (number <= 300) {
+        const path = `pages/${project.prefix}_${number}.jpg`;
+        const exists = await imageExists(path);
+
+        if (!exists) {
+          break;
+        }
+
+        pages.push({
+          number,
+          src: path,
+          split: project.splitPages.includes(number)
+        });
+
+        number++;
+      }
+
+      return pages;
+    }
+
+    function imageExists(src) {
+      return new Promise((resolve) => {
+        const image = new Image();
+
+        image.onload = () => resolve(true);
+        image.onerror = () => resolve(false);
+        image.src = src;
+      });
+    }
+
+    async function openProject(project) {
+      activeProject = project;
+      homeIntro.style.display = "none";
+      projectGrid.style.display = "none";
+      projectPage.style.display = "block";
+
+      projectTitle.textContent = project.title;
+      projectDescription.textContent = project.description;
+      pagesGrid.innerHTML = '<div class="empty-message">Loading pages…</div>';
+
+      window.scrollTo({ top: 0, behavior: "instant" });
+
+      activePages = await discoverPages(project);
+
+      renderProjectPages();
+    }
+
+    function renderProjectPages() {
+      pagesGrid.innerHTML = "";
+
+      if (activePages.length === 0) {
+        pagesGrid.innerHTML = `
+          <div class="empty-message">
+            No pages found. Check the filenames in the pages folder.
+          </div>`;
+        pageCount.textContent = "0 pages";
+        return;
+      }
+
+      pageCount.textContent =
+        `${activePages.length} page${activePages.length === 1 ? "" : "s"}`;
+
+      activePages.forEach((page) => {
+        const thumb = document.createElement("div");
+        thumb.className = "page-thumb";
+
+        const image = document.createElement("img");
+        image.src = page.src;
+        image.alt = `${activeProject.title}, page ${page.number}`;
+        image.loading = "lazy";
+
+        thumb.appendChild(image);
+
+        if (page.split) {
+          const quadrantGrid = document.createElement("div");
+          quadrantGrid.className = "quadrant-grid";
+
+          quadrantNames.forEach((quadrant, index) => {
+            const cell = document.createElement("div");
+            cell.className = "quadrant";
+            cell.title = quadrantLabels[index];
+
+            cell.addEventListener("click", (event) => {
+              event.stopPropagation();
+
+              const sequence = buildSequence(activeProject, activePages);
+              const targetIndex = sequence.findIndex((item) =>
+                item.pageNumber === page.number &&
+                item.quadrant === quadrant
+              );
+
+              openViewer(sequence, targetIndex);
+            });
+
+            quadrantGrid.appendChild(cell);
+          });
+
+          thumb.appendChild(quadrantGrid);
+        }
+
+        const label = document.createElement("span");
+        label.className = "page-label";
+        label.textContent = `Page ${page.number}`;
+        thumb.appendChild(label);
+
+        thumb.addEventListener("click", () => {
+          const sequence = buildSequence(activeProject, activePages);
+          const targetIndex = sequence.findIndex((item) =>
+            item.pageNumber === page.number &&
+            !item.quadrant
+          );
+
+          if (targetIndex !== -1) {
+            openViewer(sequence, targetIndex);
+          } else {
+            const firstQuadrantIndex = sequence.findIndex((item) =>
+              item.pageNumber === page.number
+            );
+
+            openViewer(sequence, firstQuadrantIndex);
+          }
+        });
+
+        pagesGrid.appendChild(thumb);
+      });
+    }
+
+    function buildSequence(project, pages) {
+      const sequence = [];
+
+      pages.forEach((page) => {
+        if (page.split) {
+          quadrantNames.forEach((quadrant, index) => {
+            sequence.push({
+              src: page.src,
+              pageNumber: page.number,
+              quadrant,
+              quadrantLabel: quadrantLabels[index],
+              projectTitle: project.title
+            });
+          });
+        } else {
+          sequence.push({
+            src: page.src,
+            pageNumber: page.number,
+            quadrant: null,
+            quadrantLabel: null,
+            projectTitle: project.title
+          });
+        }
+      });
+
+      return sequence;
+    }
+
+    function openViewer(sequence, index) {
+      if (!sequence.length || index < 0) {
+        return;
+      }
+
+      activeSequence = sequence;
+      activeIndex = index;
+
+      viewer.classList.add("open");
+      viewer.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+
+      showSlide();
+    }
+
+    function showSlide() {
+      if (!activeSequence.length) {
+        return;
+      }
+
+      const item = activeSequence[activeIndex];
+
+      largeSlide.src = item.src;
+      largeSlide.alt = `${item.projectTitle}, page ${item.pageNumber}`;
+
+      largeSlideFrame.className = "large-slide-frame";
+
+      if (item.quadrant) {
+        largeSlideFrame.classList.add("zoomed", item.quadrant);
+      }
+
+      viewerTitle.textContent = item.quadrant
+        ? `${item.projectTitle} · Page ${item.pageNumber} · ${item.quadrantLabel}`
+        : `${item.projectTitle} · Page ${item.pageNumber}`;
+
+      viewerCounter.textContent =
+        `${activeIndex + 1} / ${activeSequence.length}`;
+    }
+
+    function nextSlide() {
+      if (!activeSequence.length) return;
+
+      activeIndex = (activeIndex + 1) % activeSequence.length;
+      showSlide();
+    }
+
+    function previousSlide() {
+      if (!activeSequence.length) return;
+
+      activeIndex =
+        (activeIndex - 1 + activeSequence.length) %
+        activeSequence.length;
+
+      showSlide();
+    }
+
+    function closeViewer() {
+      viewer.classList.remove("open");
+      viewer.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function closeProject() {
+      projectPage.style.display = "none";
+      projectGrid.style.display = "grid";
+      homeIntro.style.display = "block";
+      activeProject = null;
+
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+
+    document.getElementById("backButton").addEventListener("click", closeProject);
+    document.getElementById("closeViewer").addEventListener("click", closeViewer);
+    document.getElementById("nextSlide").addEventListener("click", nextSlide);
+    document.getElementById("previousSlide").addEventListener("click", previousSlide);
+
+    viewer.addEventListener("click", (event) => {
+      if (event.target === viewer || event.target.id === "viewerContent") {
+        closeViewer();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (!viewer.classList.contains("open")) return;
+
+      if (event.key === "ArrowRight") nextSlide();
+      if (event.key === "ArrowLeft") previousSlide();
+      if (event.key === "Escape") closeViewer();
+    });
+
+    let wheelLocked = false;
+
+    viewer.addEventListener("wheel", (event) => {
+      if (!viewer.classList.contains("open") || wheelLocked) return;
+
+      event.preventDefault();
+      wheelLocked = true;
+
+      if (event.deltaY > 0 || event.deltaX > 0) {
+        nextSlide();
+      } else if (event.deltaY < 0 || event.deltaX < 0) {
+        previousSlide();
+      }
+
+      setTimeout(() => {
+        wheelLocked = false;
+      }, 450);
+    }, { passive: false });
+
+    renderProjects();
+  </script>
 </body>
 </html>
