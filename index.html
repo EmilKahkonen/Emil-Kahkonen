@@ -760,8 +760,10 @@
     }
 
     function applyManualZoom() {
-      largeSlideFrame.style.transformOrigin = "center center";
-      largeSlideFrame.style.transform = `translate(${zoomX}px, ${zoomY}px) scale(${manualZoom})`;
+      // Liikutetaan vain kuvaa, ei kehystä: kuvasuhde pysyy oikeana.
+      largeSlide.style.transformOrigin = "center center";
+      largeSlide.style.transform = `translate(${zoomX}px, ${zoomY}px) scale(${manualZoom})`;
+      zoomReset.classList.toggle("visible", zoomIndex >= 0 || manualZoom > 1.001);
     }
 
     function nextSlide() {
@@ -830,39 +832,85 @@
 
       if (event.key === "ArrowRight") nextSlide();
       if (event.key === "ArrowLeft") previousSlide();
-      if (event.key === "Escape") closeViewer();
+      if (event.key === "Escape") {
+        if (zoomIndex >= 0 || manualZoom > 1.001) showSlide();
+        else closeViewer();
+      }
     });
 
     let wheelLocked = false;
+    let wheelUnlockTimer;
+
+    function limitPan() {
+      const rect = largeSlideFrame.getBoundingClientRect();
+      const maxX = rect.width * Math.max(0, manualZoom - 1) / 2;
+      const maxY = rect.height * Math.max(0, manualZoom - 1) / 2;
+      zoomX = Math.max(-maxX, Math.min(maxX, zoomX));
+      zoomY = Math.max(-maxY, Math.min(maxY, zoomY));
+    }
 
     viewer.addEventListener("wheel", (event) => {
       if (!viewer.classList.contains("open")) return;
       event.preventDefault();
+
+      // Ctrl + rulla: pieni, tasainen zoomaus hiiren kohdalle.
       if (event.ctrlKey || event.metaKey) {
         const oldZoom = manualZoom;
-        manualZoom = Math.max(1, Math.min(6, manualZoom * Math.exp(-event.deltaY * 0.008)));
+        const change = Math.exp(-event.deltaY * 0.0015);
+        manualZoom = Math.max(1, Math.min(6, oldZoom * change));
+        if (manualZoom < 1.015) manualZoom = 1;
+
         const rect = largeSlideFrame.getBoundingClientRect();
         const x = event.clientX - (rect.left + rect.width / 2);
         const y = event.clientY - (rect.top + rect.height / 2);
         const ratio = manualZoom / oldZoom;
         zoomX = zoomX * ratio + x * (1 - ratio);
         zoomY = zoomY * ratio + y * (1 - ratio);
-        if (manualZoom === 1) { zoomX = 0; zoomY = 0; }
+
+        if (manualZoom === 1) {
+          zoomX = 0;
+          zoomY = 0;
+          // Zoomattu neljännes palautuu kokonaiseen diaan,
+          // jolloin tavallinen rulla vaihtaa jälleen sivuja.
+          if (zoomIndex >= 0 && event.deltaY > 0) {
+            showSlide();
+            return;
+          }
+        }
+        limitPan();
         applyManualZoom();
         return;
       }
-      if (wheelLocked) return;
-      wheelLocked = true;
 
-      if (event.deltaY > 0 || event.deltaX > 0) {
-        nextSlide();
-      } else if (event.deltaY < 0 || event.deltaX < 0) {
-        previousSlide();
+      // Neljänneksessä tai zoomattuna rulla panoroi kuvaa.
+      // Shift + rulla liikuttaa vaakasuunnassa.
+      if (zoomIndex >= 0 || manualZoom > 1.001) {
+        const dx = event.shiftKey ? (event.deltaY || event.deltaX) : event.deltaX;
+        const dy = event.shiftKey ? 0 : event.deltaY;
+        zoomX -= dx;
+        zoomY -= dy;
+        // Neljänneskuvassa sallitaan liikettä myös perustasolla.
+        if (zoomIndex >= 0 && manualZoom === 1) {
+          const rect = largeSlideFrame.getBoundingClientRect();
+          zoomX = Math.max(-rect.width / 2, Math.min(rect.width / 2, zoomX));
+          zoomY = Math.max(-rect.height / 2, Math.min(rect.height / 2, zoomY));
+        } else {
+          limitPan();
+        }
+        applyManualZoom();
+        return;
       }
 
-      setTimeout(() => {
-        wheelLocked = false;
-      }, 450);
+      // Vain kokonaisen, zoomaamattoman dian rulla vaihtaa sivua.
+      if (wheelLocked) return;
+      const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX)
+        ? event.deltaY : event.deltaX;
+      if (Math.abs(delta) < 3) return;
+      wheelLocked = true;
+      if (delta > 0) nextSlide();
+      else previousSlide();
+      clearTimeout(wheelUnlockTimer);
+      wheelUnlockTimer = setTimeout(() => { wheelLocked = false; }, 450);
     }, { passive: false });
 
     renderProjects();
