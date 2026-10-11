@@ -22,7 +22,8 @@
       margin: 0;
       background: var(--background);
       color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: "Courier New", Courier, monospace;
+      letter-spacing: -0.025em;
     }
 
     button {
@@ -34,18 +35,20 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 18px;
       border-bottom: 1px solid var(--line);
     }
 
     .site-name {
       color: var(--text);
       text-decoration: none;
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+      font-size: clamp(12px, 1.6vw, 17px);
+      font-weight: 400;
+      letter-spacing: -0.035em;
     }
 
     header a {
+      overflow-wrap: anywhere;
       color: var(--text);
       text-decoration: none;
       font-size: 13px;
@@ -84,9 +87,9 @@
       background: transparent;
       color: #aaa;
       cursor: pointer;
-      font-size: clamp(24px, 4.3vw, 52px);
+      font-size: clamp(21px, 4vw, 49px);
       font-weight: 400;
-      letter-spacing: -0.055em;
+      letter-spacing: -0.07em;
       padding: 0;
       transition: color .2s ease;
       white-space: nowrap;
@@ -175,7 +178,7 @@
     .project-heading h1 {
       font-size: clamp(34px, 6vw, 72px);
       line-height: 1;
-      letter-spacing: -0.05em;
+      letter-spacing: -0.055em;
       font-weight: 400;
       margin: 0;
     }
@@ -457,7 +460,7 @@
 
 <body>
   <header>
-    <a class="site-name" href="#" id="siteName">PORTFOLIO</a>
+    <a class="site-name" href="#" id="siteName">Portfolio. Emil Kähkönen. 2026.</a>
     <a href="mailto:your.email@example.com">CONTACT</a>
   </header>
 
