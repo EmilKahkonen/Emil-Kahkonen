@@ -1035,6 +1035,8 @@ I believe that architecture carries a responsibility to understand what we desig
       let pending = null;
       let frame = 0;
       let stroke = null;
+      let turnAxis = null;
+      let turnDistance = 0;
       const axes = [
         [0, 1], [0, -1],
         [Math.cos(Math.PI / 6), Math.sin(Math.PI / 6)],
@@ -1090,7 +1092,9 @@ I believe that architecture carries a responsibility to understand what we desig
         const dx = point.x - last.x, dy = point.y - last.y;
         const distance = Math.hypot(dx, dy);
         if (distance < 0.5) return;
-        if (distance > 140) { last = point; stroke = null; return; }
+        // Nopeakin hiiren liike jatkaa samaa viivaa; vain poikkeuksellisen
+        // suuri koordinaattihyppy (esim. ikkunasta poistuminen) katkaisee sen.
+        if (distance > 900) { last = point; stroke = null; turnAxis = null; turnDistance = 0; return; }
         if (!stroke) beginStroke(last, closestAxis(dx, dy));
         // Suunnanvaihto päätellään hiiren viimeaikaisesta liikkeestä,
         // ei viivan päätepisteestä: näin myös terävä V-käännös onnistuu.
@@ -1106,6 +1110,8 @@ I believe that architecture carries a responsibility to understand what we desig
         if (turnAxis && turnDistance >= switchDistance) {
           paintStroke();
           beginStroke(stroke.end, candidate);
+          turnAxis = null;
+          turnDistance = 0;
         }
         const projection = (point.x - stroke.start.x) * stroke.axis[0]
           + (point.y - stroke.start.y) * stroke.axis[1];
@@ -1122,7 +1128,7 @@ I believe that architecture carries a responsibility to understand what we desig
       }
       main.addEventListener("pointermove", event => {
         if (event.pointerType !== "mouse" || viewer.classList.contains("open") || activeProject || insideCard(event.clientX, event.clientY)) {
-          last = null; stroke = null; return;
+          last = null; stroke = null; turnAxis = null; turnDistance = 0; return;
         }
         const rect = main.getBoundingClientRect();
         pending = { x: event.clientX - rect.left, y: event.clientY - rect.top };
@@ -1134,10 +1140,12 @@ I believe that architecture carries a responsibility to understand what we desig
         last = null;
         pending = null;
         stroke = null;
+        turnAxis = null;
+        turnDistance = 0;
         if (frame) cancelAnimationFrame(frame);
         frame = 0;
       });
-      main.addEventListener("pointerleave", () => { last = null; stroke = null; });
+      main.addEventListener("pointerleave", () => { last = null; stroke = null; turnAxis = null; turnDistance = 0; });
       window.addEventListener("resize", resize);
       new ResizeObserver(resize).observe(main);
       resize();
