@@ -856,7 +856,8 @@
         largeSlide.style.height = `${200 * manualZoom}%`;
         largeSlide.style.maxWidth = "none";
         largeSlide.style.maxHeight = "none";
-        largeSlide.style.objectFit = "fill";
+        // Säilytä alkuperäinen kuvasuhde myös mobiilissa: ei venytetä neljänneksiä.
+        largeSlide.style.objectFit = "contain";
         largeSlide.style.left = `${-col * w * manualZoom - (manualZoom - 1) * w / 2 + zoomX}px`;
         largeSlide.style.top = `${-row * h * manualZoom - (manualZoom - 1) * h / 2 + zoomY}px`;
       } else {
