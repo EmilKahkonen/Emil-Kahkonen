@@ -734,6 +734,8 @@
           const cell = document.createElement("button");
           cell.type = "button";
           cell.className = "quadrant";
+          cell.style.gridColumn = String(index % 2 + 1);
+          cell.style.gridRow = String(Math.floor(index / 2) + 1);
           cell.title = quadrantLabels[index];
           cell.setAttribute("aria-label", `Zoom: ${quadrantLabels[index]}`);
           cell.addEventListener("click", event => {
@@ -760,9 +762,34 @@
     }
 
     function applyManualZoom() {
-      // Liikutetaan vain kuvaa, ei kehystä: kuvasuhde pysyy oikeana.
+      // Neljännes on itsenäinen rajattu katselualue. Zoomaus ei
+      // koskaan siirrä näkyviin viereisen neljänneksen sisältöä.
+      largeSlide.style.transform = "";
       largeSlide.style.transformOrigin = "center center";
-      largeSlide.style.transform = `translate(${zoomX}px, ${zoomY}px) scale(${manualZoom})`;
+      if (zoomIndex >= 0) {
+        const w = largeSlideFrame.clientWidth;
+        const h = largeSlideFrame.clientHeight;
+        const col = zoomIndex % 2;
+        const row = Math.floor(zoomIndex / 2);
+        // Kuva täyttää neljänneskehyksen 2x2-kokoisena.
+        // Zoomauksen keskipiste on valitun neljänneksen keskipiste.
+        largeSlide.style.width = `${200 * manualZoom}%`;
+        largeSlide.style.height = `${200 * manualZoom}%`;
+        largeSlide.style.maxWidth = "none";
+        largeSlide.style.maxHeight = "none";
+        largeSlide.style.objectFit = "fill";
+        largeSlide.style.left = `${-col * w * manualZoom - (manualZoom - 1) * w / 2 + zoomX}px`;
+        largeSlide.style.top = `${-row * h * manualZoom - (manualZoom - 1) * h / 2 + zoomY}px`;
+      } else {
+        largeSlide.style.removeProperty("width");
+        largeSlide.style.removeProperty("height");
+        largeSlide.style.removeProperty("max-width");
+        largeSlide.style.removeProperty("max-height");
+        largeSlide.style.removeProperty("object-fit");
+        largeSlide.style.removeProperty("left");
+        largeSlide.style.removeProperty("top");
+        largeSlide.style.transform = `translate(${zoomX}px, ${zoomY}px) scale(${manualZoom})`;
+      }
       zoomReset.classList.toggle("visible", zoomIndex >= 0 || manualZoom > 1.001);
     }
 
@@ -842,9 +869,10 @@
     let wheelUnlockTimer;
 
     function limitPan() {
-      const rect = largeSlideFrame.getBoundingClientRect();
-      const maxX = rect.width * Math.max(0, manualZoom - 1) / 2;
-      const maxY = rect.height * Math.max(0, manualZoom - 1) / 2;
+      const w = largeSlideFrame.clientWidth;
+      const h = largeSlideFrame.clientHeight;
+      const maxX = w * Math.max(0, manualZoom - 1) / 2;
+      const maxY = h * Math.max(0, manualZoom - 1) / 2;
       zoomX = Math.max(-maxX, Math.min(maxX, zoomX));
       zoomY = Math.max(-maxY, Math.min(maxY, zoomY));
     }
@@ -853,12 +881,13 @@
       if (!viewer.classList.contains("open")) return;
       event.preventDefault();
 
-      // Ctrl + rulla: pieni, tasainen zoomaus hiiren kohdalle.
+      // Ctrl + rulla zoomaa hienovaraisesti. Neljänneksessä
+      // zoomaus kohdistuu VAIN kyseiseen neljännekseen.
       if (event.ctrlKey || event.metaKey) {
         const oldZoom = manualZoom;
-        const change = Math.exp(-event.deltaY * 0.0015);
-        manualZoom = Math.max(1, Math.min(6, oldZoom * change));
-        if (manualZoom < 1.015) manualZoom = 1;
+        manualZoom = Math.max(1, Math.min(6,
+          oldZoom * Math.exp(-event.deltaY * 0.0012)));
+        if (manualZoom < 1.012) manualZoom = 1;
 
         const rect = largeSlideFrame.getBoundingClientRect();
         const x = event.clientX - (rect.left + rect.width / 2);
@@ -866,42 +895,26 @@
         const ratio = manualZoom / oldZoom;
         zoomX = zoomX * ratio + x * (1 - ratio);
         zoomY = zoomY * ratio + y * (1 - ratio);
+        if (manualZoom === 1) { zoomX = 0; zoomY = 0; }
+        limitPan();
+        applyManualZoom();
+        return;
+      }
 
-        if (manualZoom === 1) {
-          zoomX = 0;
-          zoomY = 0;
-          // Zoomattu neljännes palautuu kokonaiseen diaan,
-          // jolloin tavallinen rulla vaihtaa jälleen sivuja.
-          if (zoomIndex >= 0 && event.deltaY > 0) {
-            showSlide();
-            return;
-          }
+      // Kun zoom > 1: rulla panoroi pystysuunnassa,
+      // Shift + rulla vaakasuunnassa. Ei vaihda neljännestä.
+      if (manualZoom > 1.001) {
+        if (event.shiftKey) zoomX -= (event.deltaY || event.deltaX);
+        else {
+          zoomX -= event.deltaX;
+          zoomY -= event.deltaY;
         }
         limitPan();
         applyManualZoom();
         return;
       }
 
-      // Neljänneksessä tai zoomattuna rulla panoroi kuvaa.
-      // Shift + rulla liikuttaa vaakasuunnassa.
-      if (zoomIndex >= 0 || manualZoom > 1.001) {
-        const dx = event.shiftKey ? (event.deltaY || event.deltaX) : event.deltaX;
-        const dy = event.shiftKey ? 0 : event.deltaY;
-        zoomX -= dx;
-        zoomY -= dy;
-        // Neljänneskuvassa sallitaan liikettä myös perustasolla.
-        if (zoomIndex >= 0 && manualZoom === 1) {
-          const rect = largeSlideFrame.getBoundingClientRect();
-          zoomX = Math.max(-rect.width / 2, Math.min(rect.width / 2, zoomX));
-          zoomY = Math.max(-rect.height / 2, Math.min(rect.height / 2, zoomY));
-        } else {
-          limitPan();
-        }
-        applyManualZoom();
-        return;
-      }
-
-      // Vain kokonaisen, zoomaamattoman dian rulla vaihtaa sivua.
+      // Kun zoom = 1: rulla vaihtaa neljännestä / diaa.
       if (wheelLocked) return;
       const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX)
         ? event.deltaY : event.deltaX;
