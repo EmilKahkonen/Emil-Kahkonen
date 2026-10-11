@@ -169,8 +169,8 @@
 
     .pages-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
     }
 
     .page-thumb {
@@ -312,7 +312,7 @@
       height: 200%;
       max-width: none;
       max-height: none;
-      object-fit: fill;
+      object-fit: contain;
     }
 
     .large-slide-frame.q-tl img {
@@ -404,7 +404,7 @@
       }
 
       .pages-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .project-heading {
@@ -509,7 +509,8 @@
         description: "A project exploring place, history and reuse.",
         prefix: "03 - Lapinlahti",
         cover: "covers/03 - Lapinlahti.jpg",
-        splitPages: []
+        splitPages: [2, 3, 4],
+        topOnlyPages: [4]
       },
       {
         title: "04 - Cultural Centre",
@@ -517,7 +518,7 @@
         description: "A cultural centre project.",
         prefix: "04 - Cultural Centre",
         cover: "covers/04 - Cultural Centre.jpg",
-        splitPages: []
+        splitPages: [2]
       },
       {
         title: "05 - Apartment Building",
@@ -525,7 +526,7 @@
         description: "An apartment building project.",
         prefix: "05 - Apartment Building",
         cover: "covers/05 - Apartment Building.jpg",
-        splitPages: []
+        splitPages: [2]
       }
     ];
 
@@ -548,6 +549,9 @@
     let activeSequence = [];
     let activeIndex = 0;
     let zoomIndex = -1;
+    let manualZoom = 1;
+    let zoomX = 0;
+    let zoomY = 0;
     let requestToken = 0;
 
     const quadrantNames = ["q-tl", "q-tr", "q-bl", "q-br"];
@@ -612,7 +616,8 @@
         pages.push({
           number,
           src: path,
-          split: project.splitPages.includes(number)
+          split: project.splitPages.includes(number),
+          quadrants: (project.topOnlyPages || []).includes(number) ? [0, 1] : [0, 1, 2, 3]
         });
 
         number++;
@@ -696,6 +701,7 @@
         src: page.src,
         pageNumber: page.number,
         split: page.split,
+        quadrants: page.quadrants,
         projectTitle: project.title
       }));
     }
@@ -713,14 +719,18 @@
     function showSlide() {
       if (!activeSequence.length) return;
       zoomIndex = -1;
+      manualZoom = 1;
+      zoomX = 0;
+      zoomY = 0;
       const item = activeSequence[activeIndex];
       largeSlide.src = item.src;
       largeSlide.alt = `${item.projectTitle}, page ${item.pageNumber}`;
       largeSlideFrame.className = "large-slide-frame";
+      applyManualZoom();
       viewerQuadrants.innerHTML = "";
       viewerQuadrants.hidden = !item.split;
       if (item.split) {
-        quadrantNames.forEach((quadrant, index) => {
+        item.quadrants.forEach((index) => {
           const cell = document.createElement("button");
           cell.type = "button";
           cell.className = "quadrant";
@@ -742,15 +752,24 @@
       zoomIndex = index;
       const item = activeSequence[activeIndex];
       largeSlideFrame.className = `large-slide-frame zoomed ${quadrantNames[index]}`;
+      manualZoom = 1; zoomX = 0; zoomY = 0;
+      applyManualZoom();
       viewerQuadrants.hidden = true;
       viewerTitle.textContent = `${item.projectTitle} · Page ${item.pageNumber} · ${quadrantLabels[index]}`;
       zoomReset.classList.add("visible");
     }
 
+    function applyManualZoom() {
+      largeSlideFrame.style.transformOrigin = "center center";
+      largeSlideFrame.style.transform = `translate(${zoomX}px, ${zoomY}px) scale(${manualZoom})`;
+    }
+
     function nextSlide() {
       if (!activeSequence.length) return;
-      if (zoomIndex >= 0 && zoomIndex < 3) {
-        zoomTo(zoomIndex + 1);
+      const available = activeSequence[activeIndex].split ? activeSequence[activeIndex].quadrants : [];
+      const position = available.indexOf(zoomIndex);
+      if (position >= 0 && position < available.length - 1) {
+        zoomTo(available[position + 1]);
         return;
       }
       activeIndex = (activeIndex + 1) % activeSequence.length;
@@ -759,11 +778,13 @@
 
     function previousSlide() {
       if (!activeSequence.length) return;
-      if (zoomIndex > 0) {
-        zoomTo(zoomIndex - 1);
+      const available = activeSequence[activeIndex].split ? activeSequence[activeIndex].quadrants : [];
+      const position = available.indexOf(zoomIndex);
+      if (position > 0) {
+        zoomTo(available[position - 1]);
         return;
       }
-      if (zoomIndex === 0) {
+      if (position === 0) {
         showSlide();
         return;
       }
@@ -815,9 +836,22 @@
     let wheelLocked = false;
 
     viewer.addEventListener("wheel", (event) => {
-      if (!viewer.classList.contains("open") || wheelLocked) return;
-
+      if (!viewer.classList.contains("open")) return;
       event.preventDefault();
+      if (event.ctrlKey || event.metaKey) {
+        const oldZoom = manualZoom;
+        manualZoom = Math.max(1, Math.min(6, manualZoom * Math.exp(-event.deltaY * 0.008)));
+        const rect = largeSlideFrame.getBoundingClientRect();
+        const x = event.clientX - (rect.left + rect.width / 2);
+        const y = event.clientY - (rect.top + rect.height / 2);
+        const ratio = manualZoom / oldZoom;
+        zoomX = zoomX * ratio + x * (1 - ratio);
+        zoomY = zoomY * ratio + y * (1 - ratio);
+        if (manualZoom === 1) { zoomX = 0; zoomY = 0; }
+        applyManualZoom();
+        return;
+      }
+      if (wheelLocked) return;
       wheelLocked = true;
 
       if (event.deltaY > 0 || event.deltaX > 0) {
