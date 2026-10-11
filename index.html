@@ -1086,13 +1086,18 @@
         if (distance < 0.5) return;
         if (distance > 140) { last = point; stroke = null; return; }
         if (!stroke) beginStroke(last, closestAxis(dx, dy));
-        const vx = point.x - stroke.end.x, vy = point.y - stroke.end.y;
+        // Suunnanvaihto päätellään hiiren viimeaikaisesta liikkeestä,
+        // ei viivan päätepisteestä: näin myös terävä V-käännös onnistuu.
+        const vx = point.x - last.x, vy = point.y - last.y;
         const deviation = Math.hypot(vx, vy);
         const alignment = deviation ? (vx * stroke.axis[0] + vy * stroke.axis[1]) / deviation : 1;
         const candidate = closestAxis(vx, vy);
-        // Pidetään sama akseli, kunnes liike kääntyy selvästi uuteen suuntaan.
-        if (deviation > switchDistance && alignment < switchCosine && candidate !== stroke.axis &&
-            (candidate[0] * stroke.axis[0] + candidate[1] * stroke.axis[1] > -0.5)) {
+        // Suunnan tulee muuttua selvästi ja jatkua hetken ennen lukituksen vaihtoa.
+        if (candidate !== stroke.axis && alignment < switchCosine) {
+          if (turnAxis !== candidate) { turnAxis = candidate; turnDistance = 0; }
+          turnDistance += deviation;
+        } else { turnAxis = null; turnDistance = 0; }
+        if (turnAxis && turnDistance >= switchDistance) {
           paintStroke();
           beginStroke(stroke.end, candidate);
         }
