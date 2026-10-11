@@ -36,8 +36,8 @@
       justify-content: space-between;
       align-items: center;
       gap: 18px;
-      border-bottom: 1px solid #e7b99b;
-      background: #f4d8c4;
+      border-bottom: 1px solid #d8dfe3;
+      background: #edf0f2;
       position: relative;
       z-index: 2;
     }
@@ -713,6 +713,8 @@
     }
 
     async function openProject(project) {
+      // Tyhjennä etusivun aksonometriset viivat projektia avattaessa.
+      document.dispatchEvent(new Event("clearAxonDrawing"));
       const token = ++requestToken;
       activeProject = project;
       homeIntro.style.display = "none";
@@ -1033,8 +1035,8 @@
         [Math.cos(Math.PI / 6), -Math.sin(Math.PI / 6)],
         [-Math.cos(Math.PI / 6), Math.sin(Math.PI / 6)]
       ];
-      const switchDistance = 22;
-      const switchCosine = Math.cos(35 * Math.PI / 180);
+      const switchDistance = 42;
+      const switchCosine = Math.cos(48 * Math.PI / 180);
       function resize() {
         const w = Math.ceil(main.clientWidth), h = Math.ceil(main.scrollHeight);
         const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -1069,8 +1071,8 @@
         ctx.beginPath();
         ctx.moveTo(stroke.start.x, stroke.start.y);
         ctx.lineTo(stroke.end.x, stroke.end.y);
-        ctx.strokeStyle = "rgba(18,18,18,0.72)";
-        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = "#f05a18";
+        ctx.lineWidth = 0.55;
         ctx.lineCap = "round";
         ctx.stroke();
       }
@@ -1108,6 +1110,15 @@
         const rect = main.getBoundingClientRect();
         pending = { x: event.clientX - rect.left, y: event.clientY - rect.top };
         if (!frame) frame = requestAnimationFrame(() => drawTo(pending));
+      });
+      document.addEventListener("clearAxonDrawing", () => {
+        // Poistetaan sekä valmiit että keskeneräinen viiva.
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        last = null;
+        pending = null;
+        stroke = null;
+        if (frame) cancelAnimationFrame(frame);
+        frame = 0;
       });
       main.addEventListener("pointerleave", () => { last = null; stroke = null; });
       window.addEventListener("resize", resize);
