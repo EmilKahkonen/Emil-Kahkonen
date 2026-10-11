@@ -74,8 +74,9 @@
     .project-grid {
       padding: 0 5vw 8vw;
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 48px 22px;
+      grid-template-columns: minmax(0, 420px);
+      justify-content: center;
+      gap: 52px;
     }
 
     .project-card {
@@ -399,7 +400,7 @@
       }
 
       .project-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 420px);
         gap: 32px;
       }
 
@@ -801,6 +802,11 @@
         zoomTo(available[position + 1]);
         return;
       }
+      // Viimeisen neljänneksen jälkeen näytetään ensin sama sivu kokonaisena.
+      if (position === available.length - 1 && position >= 0) {
+        showSlide();
+        return;
+      }
       activeIndex = (activeIndex + 1) % activeSequence.length;
       showSlide();
     }
@@ -855,7 +861,13 @@
     });
 
     document.addEventListener("keydown", (event) => {
-      if (!viewer.classList.contains("open")) return;
+      if (!viewer.classList.contains("open")) {
+        if (event.key === "Escape" && activeProject) {
+          event.preventDefault();
+          closeProject();
+        }
+        return;
+      }
 
       if (event.key === "ArrowRight") nextSlide();
       if (event.key === "ArrowLeft") previousSlide();
