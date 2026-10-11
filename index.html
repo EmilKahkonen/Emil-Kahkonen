@@ -417,8 +417,8 @@
     }
 
     footer {
-      background: #dce9f1;
-      border-top: 1px solid #c3d5e2;
+      background: #edf0f2;
+      border-top: 1px solid #d8dfe3;
       position: relative;
       z-index: 2;
       padding: 25px 5vw;
@@ -1090,15 +1090,20 @@
         const alignment = deviation ? (vx * stroke.axis[0] + vy * stroke.axis[1]) / deviation : 1;
         const candidate = closestAxis(vx, vy);
         // Pidetään sama akseli, kunnes liike kääntyy selvästi uuteen suuntaan.
-        if (deviation > switchDistance && alignment < switchCosine && candidate !== stroke.axis) {
+        if (deviation > switchDistance && alignment < switchCosine && candidate !== stroke.axis &&
+            (candidate[0] * stroke.axis[0] + candidate[1] * stroke.axis[1] > -0.5)) {
           paintStroke();
           beginStroke(stroke.end, candidate);
         }
         const projection = (point.x - stroke.start.x) * stroke.axis[0]
           + (point.y - stroke.start.y) * stroke.axis[1];
+        // Viivan päätepiste saa edetä vain eteenpäin: taaksepäin liikuttelu ei pyyhi jälkeä.
+        const previousLength = (stroke.end.x - stroke.start.x) * stroke.axis[0]
+          + (stroke.end.y - stroke.start.y) * stroke.axis[1];
+        const fixedLength = Math.max(previousLength, projection, 0);
         stroke.end = {
-          x: stroke.start.x + stroke.axis[0] * Math.max(0, projection),
-          y: stroke.start.y + stroke.axis[1] * Math.max(0, projection)
+          x: stroke.start.x + stroke.axis[0] * fixedLength,
+          y: stroke.start.y + stroke.axis[1] * fixedLength
         };
         paintStroke();
         last = point;
