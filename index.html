@@ -42,8 +42,8 @@
       justify-content: space-between;
       align-items: center;
       gap: 18px;
-      border-bottom: 1px solid #d8dfe3;
-      background: #edf0f2;
+      border-bottom: 1px solid var(--line);
+      background: var(--background);
       position: relative;
       z-index: 2;
     }
@@ -70,7 +70,7 @@
 
     .intro h1 {
       margin: 0 0 20px;
-      font-size: clamp(42px, 8vw, 100px);
+      font-size: clamp(34px, 6vw, 76px);
       line-height: 0.95;
       font-weight: 400;
       letter-spacing: -0.06em;
@@ -100,7 +100,7 @@
       background: transparent;
       color: #aaa;
       cursor: pointer;
-      font-size: clamp(21px, 4vw, 49px);
+      font-size: clamp(18px, 3vw, 36px);
       font-weight: 400;
       letter-spacing: -0.07em;
       padding: 0;
@@ -155,7 +155,7 @@
 
     .project-title {
       margin: 0;
-      font-size: 17px;
+      font-size: 15px;
       font-weight: 500;
     }
 
@@ -189,7 +189,7 @@
     }
 
     .project-heading h1 {
-      font-size: clamp(34px, 6vw, 72px);
+      font-size: clamp(27px, 4.5vw, 52px);
       line-height: 1;
       letter-spacing: -0.055em;
       font-weight: 400;
@@ -426,8 +426,8 @@
     }
 
     footer {
-      background: #edf0f2;
-      border-top: 1px solid #d8dfe3;
+      background: var(--background);
+      border-top: 1px solid var(--line);
       position: relative;
       z-index: 2;
       padding: 25px 5vw;
@@ -1098,7 +1098,7 @@ One of the things I like most about architecture is that there's always somethin
         ctx.beginPath();
         ctx.moveTo(stroke.start.x, stroke.start.y);
         ctx.lineTo(stroke.end.x, stroke.end.y);
-        ctx.strokeStyle = "#f05a18";
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.18)";
         ctx.lineWidth = 0.55;
         ctx.lineCap = "round";
         ctx.stroke();
