@@ -182,10 +182,10 @@
 
     .project-heading {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 24px;
-      margin-bottom: 20px;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      margin: 0 auto 30px;
     }
 
     .project-heading h1 {
@@ -197,8 +197,8 @@
     }
 
     .project-heading p {
-      max-width: 360px;
-      font-size: 13px;
+      max-width: 600px;
+      font-size: 14px;
       line-height: 1.6;
       color: #555;
       margin: 0;
@@ -459,7 +459,7 @@
       }
 
       .project-heading {
-        align-items: flex-start;
+        align-items: center;
         flex-direction: column;
       }
 
@@ -515,7 +515,6 @@ One of the things I like most about architecture is that there's always somethin
       <button class="back-button" id="backButton">← All projects</button>
 
       <div class="project-heading">
-        <h1 id="projectTitle"></h1>
         <p id="projectDescription"></p>
       </div>
 
@@ -558,7 +557,7 @@ One of the things I like most about architecture is that there's always somethin
       {
         title: "01 - Chapel",
         category: "Experimental Architecture",
-        description: "A chapel project exploring the use of birch bark.",
+        description: "A chapel design exploring the use of birch bark.",
         prefix: "01 - Chapel",
         cover: "covers/01 - Chapel.jpg",
         splitPages: [2, 3, 4, 5]
@@ -566,7 +565,7 @@ One of the things I like most about architecture is that there's always somethin
       {
         title: "02 - Map",
         category: "Mapping",
-        description: "A mapping project and investigation on Zurich.",
+        description: "A mapping study of Zurich.",
         prefix: "02 - Map",
         cover: "covers/02 - Map.jpg",
         splitPages: []
@@ -574,7 +573,7 @@ One of the things I like most about architecture is that there's always somethin
       {
         title: "03 - Lapinlahti",
         category: "Reuse",
-        description: "A project exploring history and reuse.",
+        description: "A study of the history and reuse of Lapinlahti.",
         prefix: "03 - Lapinlahti",
         cover: "covers/03 - Lapinlahti.jpg",
         splitPages: [2, 3, 4],
@@ -583,7 +582,7 @@ One of the things I like most about architecture is that there's always somethin
       {
         title: "04 - Cultural Centre",
         category: "Building Design",
-        description: "A cultural centre project.",
+        description: "A design for a cultural centre.",
         prefix: "04 - Cultural Centre",
         cover: "covers/04 - Cultural Centre.jpg",
         splitPages: [2]
@@ -591,7 +590,7 @@ One of the things I like most about architecture is that there's always somethin
       {
         title: "05 - Apartment Building",
         category: "Housing Design",
-        description: "An apartment building project.",
+        description: "A design for an apartment building.",
         prefix: "05 - Apartment Building",
         cover: "covers/05 - Apartment Building.jpg",
         splitPages: [2]
@@ -599,7 +598,7 @@ One of the things I like most about architecture is that there's always somethin
       {
         title: "06 - Poster",
         category: "Graphic Design",
-        description: "A poster design and photography project for an event.",
+        description: "Poster design and photography for an event.",
         prefix: "06 - Poster",
         cover: "covers/06 - Poster.jpg",
         splitPages: []
@@ -633,7 +632,6 @@ One of the things I like most about architecture is that there's always somethin
     projectsTab.addEventListener("click", () => switchSection("projects"));
     aboutTab.addEventListener("click", () => switchSection("about"));
     const projectPage = document.getElementById("projectPage");
-    const projectTitle = document.getElementById("projectTitle");
     const projectDescription = document.getElementById("projectDescription");
     const pageCount = document.getElementById("pageCount");
     const pagesGrid = document.getElementById("pagesGrid");
@@ -746,7 +744,6 @@ One of the things I like most about architecture is that there's always somethin
       projectGrid.style.display = "none";
       projectPage.style.display = "block";
 
-      projectTitle.textContent = project.title;
       projectDescription.textContent = project.description;
       pagesGrid.innerHTML = '<div class="empty-message">Loading pages…</div>';
 
