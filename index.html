@@ -851,7 +851,7 @@ One of the things I like most about architecture is that there's always somethin
 
     const isMobileViewer = () => window.matchMedia("(max-width: 650px) and (pointer: coarse)").matches;
 
-    function showSlide() {
+    function showSlide(showFullPage = false) {
       if (!activeSequence.length) return;
       zoomIndex = -1;
       manualZoom = 1;
@@ -884,7 +884,7 @@ One of the things I like most about architecture is that there's always somethin
       viewerCounter.textContent = `${activeIndex + 1} / ${activeSequence.length}`;
       zoomReset.classList.remove("visible");
       // Puhelimella jaettu sivu avataan suoraan ensimmäiseen neljännekseen.
-      if (isMobileViewer() && item.split && item.quadrants.length) {
+      if (!showFullPage && isMobileViewer() && item.split && item.quadrants.length) {
         zoomTo(item.quadrants[0]);
       }
     }
@@ -941,15 +941,9 @@ One of the things I like most about architecture is that there's always somethin
         zoomTo(available[position + 1]);
         return;
       }
-      // Puhelimella siirrytään viimeisestä neljänneksestä suoraan seuraavalle sivulle.
-      if (isMobileViewer() && position === available.length - 1 && position >= 0) {
-        activeIndex = (activeIndex + 1) % activeSequence.length;
-        showSlide();
-        return;
-      }
-      // Työpöydällä näytetään ensin sama sivu kokonaisena.
+      // Viimeisen neljänneksen jälkeen näytetään sivu kerran kokonaisena.
       if (position === available.length - 1 && position >= 0) {
-        showSlide();
+        showSlide(true);
         return;
       }
       activeIndex = (activeIndex + 1) % activeSequence.length;
@@ -975,6 +969,10 @@ One of the things I like most about architecture is that there's always somethin
         } else {
           showSlide();
         }
+        return;
+      }
+      if (isMobileViewer() && available.length && zoomIndex === -1) {
+        zoomTo(available[available.length - 1]);
         return;
       }
       activeIndex = (activeIndex - 1 + activeSequence.length) % activeSequence.length;
@@ -1018,7 +1016,7 @@ One of the things I like most about architecture is that there's always somethin
         contactToggle.setAttribute("aria-expanded", "false");
       }
     });
-    zoomReset.addEventListener("click", showSlide);
+    zoomReset.addEventListener("click", () => showSlide(true));
     document.getElementById("backButton").addEventListener("click", closeProject);
     document.getElementById("closeViewer").addEventListener("click", closeViewer);
     document.getElementById("nextSlide").addEventListener("click", nextSlide);
