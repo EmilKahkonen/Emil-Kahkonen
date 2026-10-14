@@ -366,6 +366,18 @@
       overflow: hidden;
     }
 
+    /* Puhelimessa neljännes pysyy katselualueen keskellä. */
+    @media (max-width: 650px) {
+      .viewer-content { min-height: 0; align-items: center; justify-content: center; }
+      .large-slide-frame.zoomed {
+        width: min(100%, calc(100dvh - 165px));
+        height: auto;
+        aspect-ratio: 1 / 1;
+        flex: 0 0 auto;
+        margin: auto;
+      }
+    }
+
     .large-slide-frame.zoomed img {
       position: absolute;
       width: 200%;
@@ -837,6 +849,8 @@ One of the things I like most about architecture is that there's always somethin
       showSlide();
     }
 
+    const isMobileViewer = () => window.matchMedia("(max-width: 650px) and (pointer: coarse)").matches;
+
     function showSlide() {
       if (!activeSequence.length) return;
       zoomIndex = -1;
@@ -869,6 +883,10 @@ One of the things I like most about architecture is that there's always somethin
       viewerTitle.textContent = `${item.projectTitle} · Page ${item.pageNumber}`;
       viewerCounter.textContent = `${activeIndex + 1} / ${activeSequence.length}`;
       zoomReset.classList.remove("visible");
+      // Puhelimella jaettu sivu avataan suoraan ensimmäiseen neljännekseen.
+      if (isMobileViewer() && item.split && item.quadrants.length) {
+        zoomTo(item.quadrants[0]);
+      }
     }
 
     function zoomTo(index) {
@@ -923,7 +941,13 @@ One of the things I like most about architecture is that there's always somethin
         zoomTo(available[position + 1]);
         return;
       }
-      // Viimeisen neljänneksen jälkeen näytetään ensin sama sivu kokonaisena.
+      // Puhelimella siirrytään viimeisestä neljänneksestä suoraan seuraavalle sivulle.
+      if (isMobileViewer() && position === available.length - 1 && position >= 0) {
+        activeIndex = (activeIndex + 1) % activeSequence.length;
+        showSlide();
+        return;
+      }
+      // Työpöydällä näytetään ensin sama sivu kokonaisena.
       if (position === available.length - 1 && position >= 0) {
         showSlide();
         return;
@@ -941,7 +965,16 @@ One of the things I like most about architecture is that there's always somethin
         return;
       }
       if (position === 0) {
-        showSlide();
+        if (isMobileViewer()) {
+          activeIndex = (activeIndex - 1 + activeSequence.length) % activeSequence.length;
+          showSlide();
+          if (activeSequence[activeIndex].split) {
+            const q = activeSequence[activeIndex].quadrants;
+            zoomTo(q[q.length - 1]);
+          }
+        } else {
+          showSlide();
+        }
         return;
       }
       activeIndex = (activeIndex - 1 + activeSequence.length) % activeSequence.length;
@@ -1025,6 +1058,26 @@ One of the things I like most about architecture is that there's always somethin
       zoomX = Math.max(-maxX, Math.min(maxX, zoomX));
       zoomY = Math.max(-maxY, Math.min(maxY, zoomY));
     }
+
+    // Pyyhkäisy vaihtaa puhelimella neljännestä tai sivua.
+    let touchStartX = 0, touchStartY = 0;
+    viewer.addEventListener("touchstart", event => {
+      if (!viewer.classList.contains("open") || event.touches.length !== 1) return;
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+    }, { passive: true });
+    viewer.addEventListener("touchend", event => {
+      if (!viewer.classList.contains("open") || !isMobileViewer() ||
+          event.changedTouches.length !== 1 || manualZoom > 1.001) return;
+      const dx = event.changedTouches[0].clientX - touchStartX;
+      const dy = event.changedTouches[0].clientY - touchStartY;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 45) return;
+      if (Math.abs(dx) > Math.abs(dy) * 0.8) {
+        dx < 0 ? nextSlide() : previousSlide();
+      } else {
+        dy < 0 ? nextSlide() : previousSlide();
+      }
+    }, { passive: true });
 
     viewer.addEventListener("wheel", (event) => {
       if (!viewer.classList.contains("open")) return;
