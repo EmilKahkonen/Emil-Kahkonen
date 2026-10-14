@@ -48,34 +48,12 @@
       z-index: 2;
     }
 
-    .header-descriptor {
-      color: var(--text);
-      font-size: 12px;
-      letter-spacing: 0.015em;
-    }
     .site-name {
-      grid-column: 1 / -1;
-      justify-self: center;
       color: var(--text);
       text-decoration: none;
-      font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
-      font-size: clamp(38px, 7vw, 78px);
-      font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -0.065em;
-      text-align: center;
-      transition: transform .2s ease;
-    }
-    .site-name:hover { transform: rotate(-1.5deg) scale(1.025); }
-    .site-name::after {
-      content: "";
-      display: block;
-      width: 46px;
-      height: 5px;
-      border-radius: 8px;
-      background: #b2c5b2;
-      margin: 14px auto 0;
-      transform: rotate(-5deg);
+      font-size: clamp(12px, 1.6vw, 17px);
+      font-weight: 400;
+      letter-spacing: -0.035em;
     }
 
     header a {
@@ -111,11 +89,10 @@
     .project-card { background: var(--background); }
     .section-nav {
       width: min(100% - 10vw, 700px);
-      margin: 68px auto 62px;
+      margin: 76px auto 62px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      column-gap: 36px;
-      row-gap: 30px;
+      gap: 36px;
       align-items: center;
     }
     .section-tab {
@@ -471,8 +448,7 @@
         padding-top: 60px;
       }
 
-      .section-nav { column-gap: 18px; row-gap: 26px; margin: 52px auto 42px; }
-      .site-name { font-size: clamp(34px, 9vw, 54px); }
+      .section-nav { gap: 18px; margin: 55px auto 42px; }
       .project-grid {
         grid-template-columns: minmax(0, 420px);
         gap: 32px;
@@ -505,14 +481,13 @@
 
 <body>
   <header>
-    <span class="header-descriptor">Architecture Portfolio · Arkkitehtuuri</span>
+    <a class="site-name" href="#" id="siteName">Emil Kähkönen | Architecture Portfolio | Arkkitehtuuri</a>
     <a href="mailto:your.email@example.com">CONTACT</a>
   </header>
 
   <main>
     <canvas id="axonCanvas" aria-hidden="true"></canvas>
     <nav class="section-nav" id="sectionNav" aria-label="Main sections">
-      <a class="site-name" href="#" id="siteName">Emil Kähkönen</a>
       <button class="section-tab active" id="projectsTab" type="button" aria-current="page">PROJECTS</button>
       <button class="section-tab" id="aboutTab" type="button">ABOUT ME</button>
     </nav>
