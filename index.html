@@ -99,8 +99,8 @@
     .section-nav {
       width: min(100% - 10vw, 700px);
       margin: 76px auto 62px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      justify-content: center;
       gap: 36px;
       align-items: center;
     }
@@ -116,8 +116,7 @@
       transition: color .2s ease;
       white-space: nowrap;
     }
-    .section-tab:first-child { text-align: right; }
-    .section-tab:last-child { text-align: left; }
+    .section-tab { text-align: center; }
     .section-tab.active, .section-tab:hover { color: var(--text); }
     .about-page { display: none; width: min(100% - 10vw, 700px); margin: 0 auto 120px; min-height: 320px; }
     .about-placeholder { width: min(100%, 420px); margin: 0 auto; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.8; }
@@ -635,7 +634,7 @@ One of the things I like most about architecture is that there's always somethin
       closeViewer();
       activeProject = null;
       projectPage.style.display = "none";
-      sectionNav.style.display = "grid";
+      sectionNav.style.display = "flex";
       const projectsActive = section === "projects";
       projectGrid.style.display = projectsActive ? "grid" : "none";
       aboutPage.style.display = projectsActive ? "none" : "block";
@@ -954,7 +953,7 @@ One of the things I like most about architecture is that there's always somethin
       ++requestToken;
       projectPage.style.display = "none";
       projectGrid.style.display = "grid";
-      sectionNav.style.display = "grid";
+      sectionNav.style.display = "flex";
       homeIntro.style.display = "none";
       activeProject = null;
 
