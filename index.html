@@ -150,6 +150,11 @@
       transition: transform 0.4s ease;
     }
 
+    /* Etusivun projektikuvat mustavalkoisina; projektisivujen kuvat pysyvät värillisinä. */
+    .project-grid .cover-wrap img {
+      filter: grayscale(100%);
+    }
+
     .project-card:hover .cover-wrap > img {
       transform: scale(1.025);
     }
