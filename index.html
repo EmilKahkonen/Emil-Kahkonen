@@ -12,6 +12,7 @@
 <meta name="author" content="Emil Kähkönen">
 
 
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -63,6 +64,14 @@
       font-size: 13px;
     }
 
+    .header-center-name { position: absolute; left: 50%; transform: translateX(-50%); font-family: "Abril Fatface", Georgia, serif; font-size: clamp(19px, 2.7vw, 34px); font-weight: 400; letter-spacing: -0.025em; white-space: nowrap; color: var(--text); text-decoration: none; }
+    .contact-wrap { position: relative; margin-left: auto; }
+    .contact-toggle { background: none; border: 0; padding: 0; color: var(--text); font-size: 13px; cursor: pointer; }
+    .contact-panel { position: absolute; right: 0; top: calc(100% + 20px); padding: 20px 22px; background: var(--background); border: 1px solid var(--line); min-width: 260px; font-size: 13px; line-height: 1.8; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+    .contact-panel[hidden] { display: none; }
+    .contact-panel a { text-decoration: underline; text-underline-offset: 3px; }
+    .contact-panel p { margin: 6px 0 0; color: var(--muted); }
+    @media (max-width: 650px) { .header-center-name { font-size: clamp(15px, 4vw, 22px); } .header-label { max-width: 90px; font-size: 10px !important; line-height: 1.4; } .contact-toggle { font-size: 11px; } .contact-panel { min-width: 230px; } }
     .intro {
       padding: 7vw 5vw 5vw;
       max-width: 1000px;
@@ -481,8 +490,15 @@
 
 <body>
   <header>
-    <a class="site-name" href="#" id="siteName">Emil Kähkönen | Architecture Portfolio | Arkkitehtuuri</a>
-    <a href="mailto:your.email@example.com">CONTACT</a>
+    <a class="site-name header-label" href="#" id="siteName">Architecture Portfolio | Arkkitehtuuri</a>
+    <a class="header-center-name" href="#" id="centerName">emil kähkönen</a>
+    <div class="contact-wrap" id="contactWrap">
+      <button class="contact-toggle" id="contactToggle" type="button" aria-expanded="false" aria-controls="contactPanel">CONTACT</button>
+      <div class="contact-panel" id="contactPanel" hidden>
+        <a href="mailto:emilxkahkonen@gmail.com">emilxkahkonen@gmail.com</a>
+        <p>Helsinki, Finland</p>
+      </div>
+    </div>
   </header>
 
   <main>
@@ -949,6 +965,21 @@ One of the things I like most about architecture is that there's always somethin
       event.preventDefault();
       closeViewer();
       switchSection("projects");
+    });
+    document.getElementById("centerName").addEventListener("click", event => {
+      event.preventDefault(); closeViewer(); switchSection("projects");
+    });
+    const contactToggle = document.getElementById("contactToggle");
+    const contactPanel = document.getElementById("contactPanel");
+    contactToggle.addEventListener("click", () => {
+      contactPanel.hidden = !contactPanel.hidden;
+      contactToggle.setAttribute("aria-expanded", String(!contactPanel.hidden));
+    });
+    document.addEventListener("click", event => {
+      if (!document.getElementById("contactWrap").contains(event.target)) {
+        contactPanel.hidden = true;
+        contactToggle.setAttribute("aria-expanded", "false");
+      }
     });
     zoomReset.addEventListener("click", showSlide);
     document.getElementById("backButton").addEventListener("click", closeProject);
