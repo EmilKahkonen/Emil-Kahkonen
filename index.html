@@ -709,9 +709,13 @@ I'm particularly drawn to architectural history, restoration and the processes t
         const image = document.createElement("img");
         image.src = project.cover;
         image.alt = project.title;
-        image.loading = "lazy";
+        // Poster on listan viimeinen: käynnistä lataus heti, jotta se on
+        // todennäköisemmin valmis käyttäjän vierittäessä sivun loppuun.
+        // Muut kansikuvat pysyvät laiskasti ladattavina.
+        const isPoster = project.prefix === "06 - Poster";
+        image.loading = isPoster ? "eager" : "lazy";
         image.decoding = "async";
-        image.fetchPriority = "low";
+        image.fetchPriority = isPoster ? "auto" : "low";
         image.width = 840;
         image.height = 840;
 
