@@ -155,8 +155,16 @@
       filter: grayscale(100%);
     }
 
+    /* Vältetään raskaita kuvasuodattimen ja skaalauksen yhdistelmiä kosketuslaitteilla. */
+    @media (hover: none) and (pointer: coarse) {
+      .project-grid .project-card { content-visibility: auto; contain-intrinsic-size: auto 480px; }
+    }
+
     .project-card:hover .cover-wrap > img {
       transform: scale(1.025);
+    }
+    @media (hover: none) and (pointer: coarse) {
+      .project-card:hover .cover-wrap > img { transform: none; }
     }
 
     .project-meta {
@@ -702,6 +710,10 @@ I'm particularly drawn to architectural history, restoration and the processes t
         image.src = project.cover;
         image.alt = project.title;
         image.loading = "lazy";
+        image.decoding = "async";
+        image.fetchPriority = "low";
+        image.width = 840;
+        image.height = 840;
 
         image.onerror = () => {
           image.style.display = "none";
@@ -1129,6 +1141,11 @@ I'm particularly drawn to architectural history, restoration and the processes t
     (() => {
       const canvas = document.getElementById("axonCanvas");
       const main = canvas.parentElement;
+      // Piirtotoiminto on tarkoitettu hiirelle; mobiilissa canvas jätetään pois.
+      if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+        canvas.style.display = "none";
+        return;
+      }
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       let last = null;
